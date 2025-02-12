@@ -1,0 +1,142 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+/// Enums
+
+enum UserRole {
+  CUSTOMER
+  GUIDE
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+/// Models
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  username  String   @unique
+  fullname  String?
+  password  String
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Optional one-to-one relation for guide profile
+  guide Guide?
+
+  // Relations for bookings and reviews
+  bookingsAsCustomer  Booking[]           @relation("CustomerBookings")
+  bookingsAsGuide     Booking[]           @relation("GuideBookings")
+  reviewsAsCustomer   Review[]            @relation("CustomerReviews")
+  reviewsAsGuide      Review[]            @relation("GuideReviews")
+  guideAvailabilities GuideAvailability[]
+  guideLanguages      GuideLanguage[]
+}
+
+model Guide {
+  // Using the same ID as the User document (one-to-one relationship)
+  guideId         String  @id @map("_id") @db.ObjectId
+  bio             String?
+  experienceYears Int?
+  location        String?
+  dailyRate       Float?
+  certifications  String?
+  rating          Float?  @default(0)
+
+  // Establish relation with User via the same ID
+  user User @relation(fields: [guideId], references: [id])
+}
+
+model Booking {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  customerId  String        @db.ObjectId
+  guideId     String        @db.ObjectId
+  startDate   DateTime
+  endDate     DateTime
+  bookingDate DateTime      @default(now())
+  status      BookingStatus @default(PENDING)
+  totalAmount Float?
+
+  // Relations to User for customer and guide
+  customer User @relation("CustomerBookings", fields: [customerId], references: [id])
+  guide    User @relation("GuideBookings", fields: [guideId], references: [id])
+
+  // A booking can have one or more reviews
+  reviews Review[]
+  Payment Payment[]
+}
+
+model Payment {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  bookingId     String        @db.ObjectId
+  amount        Float
+  paymentDate   DateTime      @default(now())
+  paymentMethod String?
+  status        PaymentStatus @default(PENDING)
+  transactionId String?
+
+  // Relation to the associated booking
+  booking Booking @relation(fields: [bookingId], references: [id])
+}
+
+model Review {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  bookingId  String   @db.ObjectId
+  guideId    String   @db.ObjectId
+  customerId String   @db.ObjectId
+  rating     Int
+  comment    String?
+  reviewDate DateTime @default(now())
+
+  // Relations
+  booking  Booking @relation(fields: [bookingId], references: [id])
+  guide    User    @relation("GuideReviews", fields: [guideId], references: [id])
+  customer User    @relation("CustomerReviews", fields: [customerId], references: [id])
+}
+
+model GuideAvailability {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  guideId       String   @db.ObjectId
+  availableDate DateTime
+  // Storing time as string (e.g., "09:00") because Prisma does not have a native time type for MongoDB.
+  startTime     String
+  endTime       String
+  isAvailable   Boolean  @default(true)
+
+  guide User @relation(fields: [guideId], references: [id])
+}
+
+model Language {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  languageCode   String          @unique
+  languageName   String
+  guideLanguages GuideLanguage[]
+}
+
+model GuideLanguage {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  guideId      String   @db.ObjectId
+  languageCode String
+  user         User     @relation(fields: [guideId], references: [id])
+  language     Language @relation(fields: [languageCode], references: [languageCode])
+}

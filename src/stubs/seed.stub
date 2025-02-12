@@ -1,0 +1,20 @@
+import Knex from 'knex';
+
+/**
+ * Seed values for `table_name`.
+ *
+ * @param   {object} knex
+ * @returns {Promise}
+ */
+export function seed(knex: Knex) {
+  return knex('table_name').insert([
+    {
+      colName: 'rowValue',
+      colName2: 'rowValue',
+    },
+    {
+      colName: 'rowValue',
+      colName2: 'rowValue',
+    },
+  ]);
+}

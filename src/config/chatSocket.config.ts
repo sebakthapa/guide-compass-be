@@ -1,0 +1,1 @@
+export const REDIS_MESSAGE_CHANNEL = 'MESSAGES';

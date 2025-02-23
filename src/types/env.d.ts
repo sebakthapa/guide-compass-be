@@ -28,6 +28,9 @@ export type EnvVars = {
   // JWT
   JWT_SECRET: string;
   TOKEN_EXPIRES: string;
+
+  // ENCRYPTION
+  ENCRYPTION_SECRET: string;
 };
 
 declare namespace NodeJS {

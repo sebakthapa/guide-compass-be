@@ -12,7 +12,7 @@ datasource db {
 /// Enums
 
 enum UserRole {
-  CUSTOMER
+  USER
   GUIDE
   ADMIN
 }
@@ -37,7 +37,8 @@ model User {
   username  String   @unique
   fullname  String?
   password  String
-  role      UserRole
+  role      UserRole @default(USER)
+  image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -50,21 +51,109 @@ model User {
   reviewsAsCustomer   Review[]            @relation("CustomerReviews")
   reviewsAsGuide      Review[]            @relation("GuideReviews")
   guideAvailabilities GuideAvailability[]
-  guideLanguages      GuideLanguage[]
 }
 
 model Guide {
-  // Using the same ID as the User document (one-to-one relationship)
-  guideId         String  @id @map("_id") @db.ObjectId
-  bio             String?
-  experienceYears Int?
-  location        String?
-  dailyRate       Float?
-  certifications  String?
-  rating          Float?  @default(0)
+  id                    String                  @id @map("_id") @db.ObjectId
+  bio                   String?
+  tagline               String?
+  location              LocationType?
+  dailyRate             Float?
+  expertises            String[]                @default([])
+  languages             String[]
+  experiences           GuideExperience[]
+  certifications        CertificationType[]
+  verification          GuideVerificationType
+  verificationDocuments VerificationDocuments[]
 
   // Establish relation with User via the same ID
-  user User @relation(fields: [guideId], references: [id])
+  user User @relation(fields: [id], references: [id])
+}
+
+enum VerificationDocumentType {
+  PASSPORT
+  LICENSE
+}
+
+model VerificationDocuments {
+  id        String                   @id @map("_id") @db.ObjectId
+  type      VerificationDocumentType
+  fileUrl   String
+  createdAt DateTime                 @default(now())
+  updatedAt DateTime                 @updatedAt
+  Guide     Guide?                   @relation(fields: [guideId], references: [id])
+  guideId   String?                  @db.ObjectId
+}
+
+type GuideVerificationType {
+  status  VerificationStatus
+  remarks String?
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+type LanguageType {
+  name String
+  code String
+  id   String
+}
+
+type LocationType {
+  country     String?
+  city        String?
+  address     String
+  coordinates Float[]
+}
+
+type CertificationType {
+  name       String
+  issuer     String
+  issuedDate DateTime
+  expiryDate DateTime?
+}
+
+type GuideExperience {
+  title       String
+  company     String?
+  location    String
+  startDate   DateTime
+  endDate     DateTime?
+  description String
+  expertises  String[]
+}
+
+// READ ONLY MODELS (NO UPDATE FROM FE, NO REFERENCES) -------------------
+model Language {
+  id   String @id @map("_id") @db.ObjectId
+  name String
+  code String
+}
+
+model Expertise {
+  id         String   @id @map("_id") @db.ObjectId
+  category   String
+  expertises String[]
+}
+
+// ----------------------------------------------------------------------
+
+enum VerificationCodeType {
+  SIGNIN
+  FORGOT_PASSWORD
+}
+
+model VerificationCode {
+  id         String               @id @default(auto()) @map("_id") @db.ObjectId
+  otp        String
+  identifier String
+  expires    DateTime             @db.Timestamp
+  type       VerificationCodeType
+
+  @@unique([otp, identifier])
 }
 
 model Booking {
@@ -124,19 +213,4 @@ model GuideAvailability {
   isAvailable   Boolean  @default(true)
 
   guide User @relation(fields: [guideId], references: [id])
-}
-
-model Language {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  languageCode   String          @unique
-  languageName   String
-  guideLanguages GuideLanguage[]
-}
-
-model GuideLanguage {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  guideId      String   @db.ObjectId
-  languageCode String
-  user         User     @relation(fields: [guideId], references: [id])
-  language     Language @relation(fields: [languageCode], references: [languageCode])
 }

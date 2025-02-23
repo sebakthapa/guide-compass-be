@@ -15,6 +15,7 @@ import './env';
 import './types/request.types';
 import env from './env';
 import { createServer } from 'node:http';
+import helmet from 'helmet';
 
 export const app = express();
 
@@ -26,8 +27,10 @@ mkdirp.sync(PUBLIC_PATH);
 if (!fs.existsSync(path.join(PUBLIC_PATH, 'favicon.ico'))) {
   fs.writeFileSync(`${PUBLIC_PATH}/favicon.ico`, '', 'utf-8');
 }
-app.use(cookieParser());
 app.use(cors({ origin: '*', credentials: true }));
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+app.use(cookieParser());
 
 // Trust the Proxy
 app.set('trust proxy', true);

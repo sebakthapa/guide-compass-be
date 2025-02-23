@@ -1,0 +1,1 @@
+export const GCLOUD_BUCKET_NAME = 'GUIDE_COMPASS';

@@ -2,58 +2,91 @@ import { Request, Response } from 'express';
 import { catchAsync } from '../utils/catchAsync';
 import { sendFailureRes, sendSuccessRes } from '../utils/formatResponse';
 import { StatusCodes } from 'http-status-codes';
-import { createUser, getUserByEmail } from '../users/users.services';
+import { LoginRequestBody, SignupRequestBody, VerifyOtpRequestBody } from '../types/auth.types';
+import { comparePassword, hashPassword } from '../utils/hashPassword';
+import { decryptData, encryptData } from '../utils/encryption';
+import { generateOtp, sendOtpMail, verifyOtp } from './auth.services';
+import { addIntoVerificationCode } from '../verificationCode/verificationTokens.services';
+import { AUTH_TOKEN_COOKIE_NAME, SIGNUP_OTP_IDENTIFIER } from './auth.config';
+import { createUser, getUserByIdentifier } from '../users/users.services';
 import { generateToken } from '../utils/generateToken';
-import { AuthTokenData, UserLoginBody, UserSignupBody } from '../types/auth.types';
-import { AUTH_TOKEN_COOKIE } from './auth.config';
-import { comparePassword } from '../utils/hashPassword';
+import { isEmpty } from 'lodash';
 
-export const authContuserSignup = catchAsync(async (req: Request, res: Response) => {
-  const data = req.body as UserSignupBody;
+export const authContValidateSignpRequest = catchAsync(async (req: Request, res: Response) => {
+  const data = req.body as SignupRequestBody;
 
-  const createdUser = await createUser({ ...data, role: 'CUSTOMER' });
-  const { email, id, fullname, role, username } = createdUser;
-  generateToken(res, { email, id, fullname, role, username } as AuthTokenData);
+  const hashedPassword = await hashPassword(data.password);
 
-  return sendSuccessRes(StatusCodes.OK)(res, 'Sign Up successfull')(createdUser);
+  const finalData = { ...data, password: hashedPassword };
+
+  const encryptedData = encryptData(JSON.stringify(finalData));
+
+  const otp = generateOtp();
+  await sendOtpMail(otp, data.email);
+  await addIntoVerificationCode({ otp, identifier: finalData[SIGNUP_OTP_IDENTIFIER], type: 'SIGNIN' });
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Signup successfull')({ token: encryptedData });
 });
 
-export const authContUserLogin = catchAsync(async (req: Request, res: Response) => {
-  const data = req.body as UserLoginBody;
-  const user = await getUserByEmail(data.email);
+export const authContVerifyOtp = catchAsync(async (req: Request, res: Response) => {
+  const { otp, token } = req.body as VerifyOtpRequestBody;
 
-  if (!user) {
-    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid credentials')({});
+  let userData: SignupRequestBody | null = null;
+
+  try {
+    userData = JSON.parse(decryptData(token)) as SignupRequestBody;
+  } catch (error) {
+    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid Data provided')({});
   }
 
-  const isValid = await comparePassword(data.password, user.password);
-  if (!isValid) {
-    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid credentials aayo')({});
+  const isOtpCorrect = await verifyOtp(otp, userData[SIGNUP_OTP_IDENTIFIER]);
+
+  if (!isOtpCorrect) {
+    return sendFailureRes(StatusCodes.OK)(res, 'Incorrect/Expired OTP')({});
   }
 
-  const { email, id, fullname, role, username } = user;
+  const createdUser = await createUser({ ...userData, role: 'USER' });
 
-  generateToken(res, { email, id, fullname, role, username } as AuthTokenData);
+  const userdetailsWithoutPassword = { ...createdUser, password: undefined };
 
-  const returningData = { ...user, password: undefined };
+  const jwtToken = generateToken(res, { id: createdUser.id });
 
-  return sendSuccessRes(StatusCodes.OK)(res, 'Login successfull')(returningData);
+  return sendSuccessRes(StatusCodes.OK)(res, 'Signup successfull')({
+    user: userdetailsWithoutPassword,
+    token: jwtToken,
+  });
+});
+
+export const authContLogin = catchAsync(async (req: Request, res: Response) => {
+  const { identifier, password } = req.body as LoginRequestBody;
+
+  const user = await getUserByIdentifier(identifier);
+
+  if (isEmpty(user)) {
+    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid Credentails a')({});
+  }
+
+  const isPasswordCorrect = await comparePassword(password, user.password);
+
+  if (!isPasswordCorrect) {
+    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid Credentails')({});
+  }
+
+  const userWithoutPassword = { ...user, password: undefined };
+
+  const token = generateToken(res, { id: user.id });
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Login Successfull')({ user: userWithoutPassword, token });
 });
 
 export const authContLogout = catchAsync((req: Request, res: Response) => {
-  res.clearCookie(AUTH_TOKEN_COOKIE);
+  res.clearCookie(AUTH_TOKEN_COOKIE_NAME);
 
-  return sendSuccessRes(StatusCodes.OK)(res, 'Logout successfull')({});
+  return sendSuccessRes(StatusCodes.OK)(res, 'Logout Successfull')({});
 });
 
-export const authContgetSession = catchAsync((req: Request, res: Response) => {
-  const user = req.decoded;
+export const authContGetSession = catchAsync((req: Request, res: Response) => {
+  const user = req.decoded!;
 
-  if (!user) {
-    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'User is not logged in')({});
-  }
-
-  const returningData = { ...user, password: undefined };
-
-  return sendSuccessRes(StatusCodes.OK)(res, 'Session data retrieved')(returningData);
+  return sendSuccessRes(StatusCodes.OK)(res, 'User Session retrieved')(user);
 });

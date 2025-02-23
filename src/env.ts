@@ -36,6 +36,9 @@ const envObject: Record<keyof EnvVars, Joi.Schema> = {
   // JWT
   JWT_SECRET: Joi.string().required(),
   TOKEN_EXPIRES: Joi.string().required(),
+
+  // ENCRYPTION
+  ENCRYPTION_SECRET: Joi.string().required(),
 };
 const envVarsSchema = Joi.object(envObject).unknown();
 

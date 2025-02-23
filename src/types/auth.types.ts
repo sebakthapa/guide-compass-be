@@ -1,6 +1,15 @@
-import { User } from '@prisma/client';
+export interface SignupRequestBody {
+  email: string;
+  username: string;
+  password: string;
+}
 
-export type AuthTokenData = Pick<User, 'email' | 'id' | 'role' | 'username' | 'fullname'>;
+export interface VerifyOtpRequestBody {
+  otp: string;
+  token: string;
+}
 
-export type UserSignupBody = Pick<User, 'password' | 'email' | 'username'>;
-export type UserLoginBody = Pick<User, 'password' | 'email'>;
+export interface LoginRequestBody {
+  identifier: string;
+  password: string;
+}

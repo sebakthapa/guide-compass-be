@@ -2,10 +2,10 @@ import prisma from '../db';
 import { GuideDetailsUpdateValidatedReqBody } from '../types/guide.types';
 
 export const upsertGuideDetailsById = async (data: Partial<GuideDetailsUpdateValidatedReqBody>, guideId: string) => {
-  const updatingDetails = {
+  const updatingDetails: GuideDetailsUpdateValidatedReqBody = {
     bio: data.bio,
     dailyRate: data.dailyRate,
-    expertise: data.expertises,
+    expertises: data.expertises,
     tagline: data.tagline,
     languages: data.languages,
     experiences: data.experiences,

@@ -1,11 +1,10 @@
 import { Storage, TransferManager, UploadOptions } from '@google-cloud/storage';
 import path from 'path';
-import { GCLOUD_BUCKET_NAME } from '../config/gcloud.config';
-import env from '../env';
+import { GCLOUD_BUCKET_NAME, GCLOUD_KEY_FILE_PATH } from '../config/gcloud.config';
 
 export const getStorage = () => {
   return new Storage({
-    keyFilename: path.join(env.ROOT_PATH!, 'googleConfigs/key.json'),
+    keyFilename: path.join(GCLOUD_KEY_FILE_PATH),
   });
 };
 

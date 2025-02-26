@@ -34,7 +34,7 @@ export const validateDetailsUpdateRequest = catchAsync(async (req: Request, res:
       const value = updatingData.languages[i];
 
       if (!allowedLanguages.includes(value)) {
-        return sendFailureRes(StatusCodes.BAD_REQUEST)(res, `${value} is not allowed in expertise`)({});
+        return sendFailureRes(StatusCodes.BAD_REQUEST)(res, `${value} is not allowed in languages`)({});
       }
     }
     verifiedUpdatingData.languages = uniq(updatingData.languages);

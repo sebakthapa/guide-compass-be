@@ -8,23 +8,17 @@ export const GUIDE_CERTIFICATION_SCHEMA = Joi.object({
   name: Joi.string().required(),
   issuer: Joi.string().required(),
   issuedDate: Joi.date().iso().required(),
-  expiryDate: Joi.date().iso(),
-});
-
-export const GUIDE_LANGUAGE_SCHEMA = Joi.object({
-  name: Joi.string().required(),
-  code: Joi.string().required(),
-  id: Joi.string().required(),
+  expiryDate: Joi.date().iso().allow(null),
 });
 
 export const GUIDE_EXPERIENCE_SCHEMA = Joi.object({
   title: Joi.string().required(),
-  company: Joi.string(),
+  company: Joi.string().allow(null),
   location: Joi.string().required(),
   startDate: Joi.date().iso().required(),
-  endDate: Joi.date().iso(),
+  endDate: Joi.date().iso().allow(null),
   description: Joi.string().required(),
-  expertises: Joi.array().items(Joi.string()),
+  expertises: Joi.array().items(Joi.string()).allow(null),
 });
 
 export const GUIDE_UPDATE_DETAILS_SCHEMA = Joi.object({
@@ -36,6 +30,6 @@ export const GUIDE_UPDATE_DETAILS_SCHEMA = Joi.object({
   languages: Joi.array().items(Joi.string()),
   experiences: Joi.array().items(GUIDE_EXPERIENCE_SCHEMA),
   certifications: Joi.array().items(GUIDE_CERTIFICATION_SCHEMA),
+  fullname: Joi.string(),
   // username: Joi.string(),
-  // fullname: Joi.string(),
 });

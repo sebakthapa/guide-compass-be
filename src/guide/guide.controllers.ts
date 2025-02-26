@@ -14,21 +14,34 @@ export const guideContUpdateDetails = catchAsync(async (req: Request, res: Respo
   const data = req.body as GuideDetailsUpdateValidatedReqBody;
   const user = req.decoded!;
 
-  const newData = await upsertGuideDetailsById(data, user.id);
+  const { guide, user: updatedUser } = await upsertGuideDetailsById(data, user.id);
 
-  return sendSuccessRes(StatusCodes.OK)(res, 'Update Successfull')(newData);
+  const { user: guideUser, ...guideOnly } = guide;
+
+  const finalUser = updatedUser || guideUser;
+
+  const { username, fullname, image } = finalUser;
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Update Successfull')({ ...{ username, fullname, image }, ...guideOnly });
 });
 
-export const guideContFetchById = catchAsync(async (req: Request, res: Response) => {
+export const guideContFetchSelfDetails = catchAsync(async (req: Request, res: Response) => {
   const user = req.decoded!;
 
-  const data = await fetchGuideDetailsById(user.id);
+  const fetchedUser = await fetchGuideDetailsById(user.id);
 
-  if (!data) {
+  if (!fetchedUser) {
     return sendSuccessRes(StatusCodes.OK)(res, 'Guide details fetched successfully')({});
   }
 
-  return sendSuccessRes(StatusCodes.OK)(res, 'Guide details Fetched Successfully')({ ...data });
+  const { guide, fullname, image, username } = fetchedUser;
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Guide details Fetched Successfully')({
+    fullname,
+    image,
+    username,
+    ...guide,
+  });
 });
 
 export const guideContFetchAllLanguages = catchAsync(async (req: Request, res: Response) => {

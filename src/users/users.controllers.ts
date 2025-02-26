@@ -1,10 +1,25 @@
 import { Request, Response } from 'express';
 import { catchAsyncFile } from '../utils/catchAsync';
-import { sendSuccessRes } from '../utils/formatResponse';
+import { sendFailureRes, sendSuccessRes } from '../utils/formatResponse';
 import { StatusCodes } from 'http-status-codes';
+import { File } from 'formidable';
+import { updateUserById, uploadUserProfile } from './users.services';
 
-export const usersContUpdateDetails = catchAsyncFile((req: Request, res: Response) => {
-  // const uploadFile = await uploadUserProfile(files)
+export const usersContUpdateDetails = catchAsyncFile(async (req: Request, res: Response) => {
+  const data = req.body;
 
-  return sendSuccessRes(StatusCodes.OK)(res, 'User details updated successfully')({});
+  // @ts-expect-error image doesn't exist on req
+  const [image] = (req.image as File[]) || [];
+  const user = req.decoded!;
+
+  if (!image) {
+    return sendFailureRes(StatusCodes.BAD_REQUEST)(res, `Invalid image received`)({});
+  }
+
+  const uploadedFile = await uploadUserProfile(image.filepath, user?.id);
+  const imageUrl = uploadedFile.publicUrl();
+
+  const updatedUser = await updateUserById(user.id, { ...data, imageUrl });
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'User details updated successfully')(updatedUser);
 });

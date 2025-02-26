@@ -9,8 +9,9 @@ export interface GuideDetailsUpdateReqBody {
   languages?: string[];
   experiences?: GuideExperience[];
   certifications?: CertificationType[];
+  fullname?: string;
+
   // username?: string;
-  // fullname?: string;
 }
 
 export interface GuideDetailsUpdateValidatedReqBody {
@@ -22,8 +23,8 @@ export interface GuideDetailsUpdateValidatedReqBody {
   languages?: string[];
   experiences?: GuideExperience[];
   certifications?: CertificationType[];
+  fullname?: string;
   // userDetails: {
   //   username?:string;
-  //   fullname?:string;
   // }
 }

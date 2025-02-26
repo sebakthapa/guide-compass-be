@@ -36,6 +36,12 @@
     "camelcase": [2, { "properties": "never" }],
     "quotes": [2, "single", { "allowTemplateLiterals": true }],
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_", // Ignore unused function arguments starting with "_"
+        "varsIgnorePattern": "^_", // Ignore unused variables starting with "_"
+      },
+    ],
   },
 }

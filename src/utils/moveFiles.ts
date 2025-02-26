@@ -66,7 +66,7 @@ export const deleteFolder = (path: string, throwErr = true) => {
 
       return reject(new Error(`Given path doesnt exist. -> ${path}`));
     } else {
-      fs.rmdirSync(path);
+      fs.rmSync(path, { recursive: true });
 
       return resolve({ path });
     }

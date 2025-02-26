@@ -63,7 +63,7 @@ model Guide {
   languages             String[]
   experiences           GuideExperience[]
   certifications        CertificationType[]
-  verification          GuideVerificationType
+  verification          GuideVerificationType?
   verificationDocuments VerificationDocuments[]
 
   // Establish relation with User via the same ID
@@ -86,7 +86,7 @@ model VerificationDocuments {
 }
 
 type GuideVerificationType {
-  status  VerificationStatus
+  status  VerificationStatus?
   remarks String?
 }
 

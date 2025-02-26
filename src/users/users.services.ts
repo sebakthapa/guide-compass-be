@@ -61,11 +61,18 @@ export const updateUserById = (
     where: {
       id,
     },
+    select: {
+      fullname: true,
+      image: true,
+      username: true,
+    },
   });
 };
 
 export const uploadUserProfile = async (imagePath: string, userId: string) => {
-  const [file] = await uploadToBucket(imagePath, { destination: `${USER_PROFILE_IMAGE_FOLDER}/${userId}` });
+  const [file] = await uploadToBucket(imagePath, {
+    destination: `${USER_PROFILE_IMAGE_FOLDER}/${userId}_${Date.now()}`,
+  });
 
   return file;
 };

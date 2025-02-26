@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "nodemon",
     "prepare": "husky",
-    "migrate": "prisma db push"
+    "migrate": "prisma db push",
+    "lint": "eslint"
   },
   "lint-staged": {
     "*.ts": [

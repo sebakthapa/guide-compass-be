@@ -7,7 +7,7 @@ import { authorizeUser, verifyToken } from '../middlewares/verifyToken';
 
 const router = Router();
 
-router.get('/', verifyToken, authorizeUser, cont.guideContFetchById);
+router.get('/', verifyToken, authorizeUser, cont.guideContFetchSelfDetails);
 
 // PATCH /api/guide/
 router.patch(
@@ -20,9 +20,9 @@ router.patch(
 );
 
 // GET /api/guide/expertise
-router.get('/expertise', cont.guideContFetchAllExpertise);
+router.get('/expertises', cont.guideContFetchAllExpertise);
 
 // GET /api/guide/expertise
-router.get('/language', cont.guideContFetchAllLanguages);
+router.get('/languages', cont.guideContFetchAllLanguages);
 
 export default router;

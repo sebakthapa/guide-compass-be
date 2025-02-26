@@ -7,6 +7,7 @@ import { authorizeUser, verifyToken } from '../middlewares/verifyToken';
 
 const router = Router();
 
+// GET /api/guide
 router.get('/', verifyToken, authorizeUser, cont.guideContFetchSelfDetails);
 
 // PATCH /api/guide/

@@ -103,9 +103,10 @@ type LanguageType {
 }
 
 type LocationType {
-  country     String?
-  city        String?
-  address     String
+  country     String
+  state       String
+  county      String
+  city        String
   coordinates Float[]
 }
 

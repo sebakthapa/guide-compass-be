@@ -6,6 +6,7 @@ import { sendFailureRes } from '../utils/formatResponse';
 import { StatusCodes } from 'http-status-codes';
 import { GuideDetailsUpdateValidatedReqBody } from '../types/guide.types';
 import { uniq } from 'lodash';
+import { getCoordinates } from '../utils/geocoding';
 
 export const validateDetailsUpdateRequest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const updatingData = req.body as Guide;
@@ -59,7 +60,14 @@ export const validateDetailsUpdateRequest = catchAsync(async (req: Request, res:
     verifiedUpdatingData.experiences = updatingData.experiences;
   }
   if (updatingData.location) {
-    verifiedUpdatingData.location = undefined;
+    const coordinates = await getCoordinates(updatingData.location);
+    if (!coordinates) {
+      return sendFailureRes(StatusCodes.BAD_REQUEST)(res, 'Invalid Location')({});
+    }
+    verifiedUpdatingData.location = {
+      ...updatingData?.location,
+      coordinates: [coordinates.latitude, coordinates.longitude],
+    };
   }
 
   const finalUpdatingData = { ...updatingData, ...verifiedUpdatingData };

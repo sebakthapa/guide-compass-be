@@ -21,10 +21,17 @@ export const GUIDE_EXPERIENCE_SCHEMA = Joi.object({
   expertises: Joi.array().items(Joi.string()).allow(null),
 });
 
+export const GUIDE_LOCATION_SCHEMA = Joi.object({
+  country: Joi.string().required(),
+  state: Joi.string().required(),
+  county: Joi.string().required(),
+  city: Joi.string().required(),
+});
+
 export const GUIDE_UPDATE_DETAILS_SCHEMA = Joi.object({
   bio: Joi.string(),
   tagline: Joi.string(),
-  location: Joi.string(),
+  location: GUIDE_LOCATION_SCHEMA,
   dailyRate: Joi.number(),
   expertises: Joi.array().items(Joi.string()),
   languages: Joi.array().items(Joi.string()),

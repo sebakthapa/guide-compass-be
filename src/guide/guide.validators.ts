@@ -66,7 +66,7 @@ export const validateDetailsUpdateRequest = catchAsync(async (req: Request, res:
     }
     verifiedUpdatingData.location = {
       ...updatingData?.location,
-      coordinates: [coordinates.latitude, coordinates.longitude],
+      geometry: { type: 'Point', coordinates: [coordinates.longitude, coordinates.latitude] },
     };
   }
 

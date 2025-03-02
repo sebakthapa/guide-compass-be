@@ -1,4 +1,4 @@
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User, UserRole } from '@prisma/client';
 import prisma from '../db';
 import { isEmail } from './users.utils';
 import { uploadToBucket } from '../utils/gcloud';
@@ -61,10 +61,14 @@ export const updateUserById = (
     where: {
       id,
     },
-    select: {
-      fullname: true,
-      image: true,
-      username: true,
+  });
+};
+
+export const changeUserRole = (id: string, role: UserRole) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      role,
     },
   });
 };

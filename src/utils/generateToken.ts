@@ -7,7 +7,7 @@ import ms from 'ms';
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const generateToken = (res: Response, data: {}) => {
   const token = jwt.sign(data, env.JWT_SECRET || '', {
-    expiresIn: env.TOKEN_EXPIRES,
+    expiresIn: +env.TOKEN_EXPIRES,
   });
 
   res.cookie(AUTH_TOKEN_COOKIE_NAME, token, {

@@ -2,19 +2,15 @@ import { Request, Response } from 'express';
 import { catchAsync } from '../utils/catchAsync';
 import { sendSuccessRes } from '../utils/formatResponse';
 import { StatusCodes } from 'http-status-codes';
-import {
-  fetchExpertiseList,
-  fetchGuideDetailsById,
-  fetchLanguagesList,
-  upsertGuideDetailsById,
-} from './guide.services';
-import { GuideDetailsUpdateValidatedReqBody } from '../types/guide.types';
+import { GuideDetailsUpdateValidatedReqBody, GuideListFetchFilters } from '../types/guide.types';
+import * as services from './guide.services';
+import { changeUserRole } from '../users/users.services';
 
 export const guideContUpdateDetails = catchAsync(async (req: Request, res: Response) => {
   const data = req.body as GuideDetailsUpdateValidatedReqBody;
   const user = req.decoded!;
 
-  const { guide, user: updatedUser } = await upsertGuideDetailsById(data, user.id);
+  const { guide, user: updatedUser } = await services.upsertGuideDetailsById(data, user.id);
 
   const { user: guideUser, ...guideOnly } = guide;
 
@@ -28,7 +24,7 @@ export const guideContUpdateDetails = catchAsync(async (req: Request, res: Respo
 export const guideContFetchSelfDetails = catchAsync(async (req: Request, res: Response) => {
   const user = req.decoded!;
 
-  const fetchedUser = await fetchGuideDetailsById(user.id);
+  const fetchedUser = await services.fetchUserWithGuideDetails(user.id);
 
   if (!fetchedUser) {
     return sendSuccessRes(StatusCodes.OK)(res, 'Guide details fetched successfully')({});
@@ -45,13 +41,38 @@ export const guideContFetchSelfDetails = catchAsync(async (req: Request, res: Re
 });
 
 export const guideContFetchAllLanguages = catchAsync(async (req: Request, res: Response) => {
-  const data = await fetchLanguagesList();
+  const data = await services.fetchLanguagesList();
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Languages fetched successfully')(data);
 });
 
 export const guideContFetchAllExpertise = catchAsync(async (req: Request, res: Response) => {
-  const data = await fetchExpertiseList();
+  const data = await services.fetchExpertiseList();
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Expertise fetched successfully')(data);
+});
+
+export const guideContFetchGuidesList = catchAsync(async (req: Request, res: Response) => {
+  // TODO:
+  /**
+   * FILTERS
+   * location
+   * near me
+   * expertise
+   */
+
+  const filters = req.body as GuideListFetchFilters;
+
+  const data = await services.fetchGuideListWithPagination(filters);
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Details fetched successfully')(data);
+});
+
+export const guideContBecomeGuide = catchAsync(async (req: Request, res: Response) => {
+  const user = req.decoded!;
+
+  const data = await changeUserRole(user?.id, 'GUIDE');
+  const { password: _, ...detailsWithoutPassword } = data;
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Became guide')(detailsWithoutPassword);
 });

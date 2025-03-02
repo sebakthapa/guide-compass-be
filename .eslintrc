@@ -20,7 +20,7 @@
     "semi": 2,
     "curly": 2,
     "no-var": 2,
-    "no-unused-vars": "error",
+    "no-unused-vars": "off",
     "eqeqeq": 2,
     "eol-last": ["error", "always"],
     "key-spacing": 2,

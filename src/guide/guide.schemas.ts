@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { PAGINATION_SCHEMA } from '../config/schema.constants';
 
 export const FETCH_BY_ID = Joi.object({
   id: Joi.number().required().integer(),
@@ -33,10 +34,16 @@ export const GUIDE_UPDATE_DETAILS_SCHEMA = Joi.object({
   tagline: Joi.string(),
   location: GUIDE_LOCATION_SCHEMA,
   dailyRate: Joi.number(),
-  expertises: Joi.array().items(Joi.string()),
-  languages: Joi.array().items(Joi.string()),
-  experiences: Joi.array().items(GUIDE_EXPERIENCE_SCHEMA),
-  certifications: Joi.array().items(GUIDE_CERTIFICATION_SCHEMA),
+  expertises: Joi.array().items(Joi.string()).max(6),
+  languages: Joi.array().items(Joi.string()).max(6),
+  experiences: Joi.array().items(GUIDE_EXPERIENCE_SCHEMA).max(5),
+  certifications: Joi.array().items(GUIDE_CERTIFICATION_SCHEMA).max(5),
   fullname: Joi.string(),
   // username: Joi.string(),
 });
+
+export const GUIDE_LIST_FETCH_SCHEMA = Joi.object({
+  // location: GUIDE_LOCATION_SCHEMA,
+  address: Joi.string(),
+  expertises: Joi.array().items(Joi.string()).max(5),
+}).concat(PAGINATION_SCHEMA);

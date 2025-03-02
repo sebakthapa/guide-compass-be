@@ -20,6 +20,7 @@ export const usersContUpdateDetails = catchAsyncFile(async (req: Request, res: R
   const imageUrl = uploadedFile.publicUrl();
 
   const updatedUser = await updateUserById(user.id, { ...data, imageUrl });
+  const { password: _pw, ...updatedUserWithoutPw } = updatedUser;
 
-  return sendSuccessRes(StatusCodes.OK)(res, 'User details updated successfully')(updatedUser);
+  return sendSuccessRes(StatusCodes.OK)(res, 'User details updated successfully')(updatedUserWithoutPw);
 });

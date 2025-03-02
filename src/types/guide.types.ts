@@ -28,3 +28,21 @@ export interface GuideDetailsUpdateValidatedReqBody {
   //   username?:string;
   // }
 }
+
+export type GuideListFetchFilters = Partial<{
+  page: number;
+  limit: number;
+  geoLocation: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+  };
+  location: {
+    country: string;
+    state: string;
+    county: string;
+    city: string;
+  };
+  address: string;
+  expertises: string[];
+}>;

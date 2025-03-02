@@ -103,11 +103,11 @@ type LanguageType {
 }
 
 type LocationType {
-  country     String
-  state       String
-  county      String
-  city        String
-  coordinates Float[]
+  country  String
+  state    String
+  county   String
+  city     String
+  geometry Json
 }
 
 type CertificationType {

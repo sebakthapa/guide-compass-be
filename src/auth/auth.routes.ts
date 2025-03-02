@@ -29,4 +29,7 @@ router.post('/login', validateData(schemas.LOGIN_SCHEMA), cont.authContLogin);
 // GET /api/login
 router.get('/session', verifyToken, cont.authContGetSession);
 
+// GET /api/logout
+router.get('/logout', cont.authContLogout);
+
 export default router;

@@ -53,12 +53,6 @@ export const guideContFetchAllExpertise = catchAsync(async (req: Request, res: R
 });
 
 export const guideContFetchGuidesList = catchAsync(async (req: Request, res: Response) => {
-  // TODO:
-  /**
-   * FILTERS
-   * near me
-   */
-
   const filters = req.body as GuideListFetchFilters;
 
   const data = await services.fetchGuideListWithPagination(filters);

@@ -158,14 +158,17 @@ model VerificationCode {
 }
 
 model Booking {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  customerId  String        @db.ObjectId
-  guideId     String        @db.ObjectId
-  startDate   DateTime
-  endDate     DateTime
-  bookingDate DateTime      @default(now())
-  status      BookingStatus @default(PENDING)
-  totalAmount Float?
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  customerId     String        @db.ObjectId
+  guideId        String        @db.ObjectId
+  startDate      DateTime
+  endDate        DateTime
+  bookingDate    DateTime      @default(now())
+  status         BookingStatus @default(PENDING)
+  totalAmount    Float?
+  numberOfPeople Int
+  destination    String
+  message        String?
 
   // Relations to User for customer and guide
   customer User @relation("CustomerBookings", fields: [customerId], references: [id])

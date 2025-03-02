@@ -56,9 +56,7 @@ export const guideContFetchGuidesList = catchAsync(async (req: Request, res: Res
   // TODO:
   /**
    * FILTERS
-   * location
    * near me
-   * expertise
    */
 
   const filters = req.body as GuideListFetchFilters;

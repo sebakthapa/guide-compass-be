@@ -168,6 +168,7 @@ export const fetchGuideListWithPagination = async (filters: GuideListFetchFilter
         name: 1,
         fullname: 1,
         username: 1,
+        image: 1,
       },
     },
   });

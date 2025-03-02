@@ -35,7 +35,7 @@ export type GuideListFetchFilters = Partial<{
   geoLocation: {
     latitude: number;
     longitude: number;
-    accuracy: number;
+    accuracy?: number;
   };
   location: {
     country: string;

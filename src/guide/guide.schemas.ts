@@ -42,8 +42,15 @@ export const GUIDE_UPDATE_DETAILS_SCHEMA = Joi.object({
   // username: Joi.string(),
 });
 
+const GEOLOCATION_SCHEMA = {
+  latitude: Joi.number().required(),
+  longitude: Joi.number().required(),
+  accuracy: Joi.number(),
+};
+
 export const GUIDE_LIST_FETCH_SCHEMA = Joi.object({
   // location: GUIDE_LOCATION_SCHEMA,
   address: Joi.string(),
   expertises: Joi.array().items(Joi.string()).max(5),
+  geolocation: GEOLOCATION_SCHEMA,
 }).concat(PAGINATION_SCHEMA);

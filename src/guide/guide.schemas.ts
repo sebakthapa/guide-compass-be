@@ -61,3 +61,7 @@ export const GUIDE_LIST_FETCH_SCHEMA = Joi.object({
 })
   .concat(PAGINATION_SCHEMA)
   .oxor('address', 'geoLocation', 'location');
+
+export const GUIDE_FETCH_SCHEMA = Joi.object({
+  guideId: Joi.string().required(),
+});

@@ -1,3 +1,5 @@
+import { BookingStatus } from '@prisma/client';
+
 export interface GuideBookingReqBody {
   guideId: string;
   startDate: string;
@@ -6,4 +8,10 @@ export interface GuideBookingReqBody {
   numberOfPeople: number;
   destination: string;
   message?: string;
+}
+
+export interface GuideBookingFetchReqBody {
+  status: BookingStatus;
+  page: number;
+  limit: number;
 }

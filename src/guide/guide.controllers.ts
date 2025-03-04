@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { catchAsync } from '../utils/catchAsync';
-import { sendSuccessRes } from '../utils/formatResponse';
+import { sendFailureRes, sendSuccessRes } from '../utils/formatResponse';
 import { StatusCodes } from 'http-status-codes';
 import { GuideDetailsUpdateValidatedReqBody, GuideListFetchFilters } from '../types/guide.types';
 import * as services from './guide.services';
@@ -60,10 +60,27 @@ export const guideContFetchGuidesList = catchAsync(async (req: Request, res: Res
   return sendSuccessRes(StatusCodes.OK)(res, 'Details fetched successfully')(data);
 });
 
+export const guideContFetchGuideDetailsById = catchAsync(async (req: Request, res: Response) => {
+  const { guideId } = req.params;
+
+  const details = await services.fetchGuideDetailsById(guideId);
+
+  if (!details) {
+    return sendFailureRes(StatusCodes.BAD_REQUEST)(res, 'Guide does not exist')({});
+  }
+
+  const { user, ...guideDetails } = details;
+
+  const formattedDetails = { ...user, ...guideDetails };
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Guide details fetched successfully')(formattedDetails);
+});
+
 export const guideContBecomeGuide = catchAsync(async (req: Request, res: Response) => {
   const user = req.decoded!;
 
-  const data = await changeUserRole(user?.id, 'GUIDE');
+  const data = await changeUserRole(user.id, 'GUIDE');
+  await services.upsertGuideDetailsById({}, user.id);
   const { password: _, ...detailsWithoutPassword } = data;
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Became guide')(detailsWithoutPassword);

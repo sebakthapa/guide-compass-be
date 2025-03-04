@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../db';
+import { GuideBookingFetchReqBody } from './booking.types';
 
 export const createNewBooking = (
   customerId: string,
@@ -17,4 +18,10 @@ export const createNewBooking = (
       ...otherData,
     },
   });
+};
+
+export const fetchGuideBookingsWithFilters = (guideId: string, filters: GuideBookingFetchReqBody) => {
+  const { status, page = 1, limit = 15 } = filters;
+
+  return prisma.booking.findMany({ where: { status, guideId }, skip: (page - 1) * limit, take: limit });
 };

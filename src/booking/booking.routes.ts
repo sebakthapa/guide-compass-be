@@ -16,4 +16,6 @@ router.post(
   cont.bookingContBookGuide
 );
 
+router.get('/guide', verifyToken, authorizeUser, cont.bookingContFetchGuideBookings);
+
 export default router;

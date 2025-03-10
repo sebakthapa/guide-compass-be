@@ -63,5 +63,8 @@ export const GUIDE_LIST_FETCH_SCHEMA = Joi.object({
   .oxor('address', 'geoLocation', 'location');
 
 export const GUIDE_FETCH_SCHEMA = Joi.object({
-  guideId: Joi.string().required(),
+  guideId: Joi.string().required().length(24).messages({
+    'string.length': 'Invalid ID. Please send a valid Guide ID',
+    'any.required': 'Guide ID is required.',
+  }),
 });

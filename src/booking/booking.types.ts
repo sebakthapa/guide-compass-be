@@ -11,7 +11,12 @@ export interface GuideBookingReqBody {
 }
 
 export interface GuideBookingFetchReqBody {
-  status: BookingStatus;
+  status?: BookingStatus;
   page: number;
   limit: number;
+}
+
+export interface BookingCalendarFetchReqBody {
+  from: string;
+  to: string;
 }

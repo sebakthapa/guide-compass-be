@@ -16,6 +16,42 @@ router.post(
   cont.bookingContBookGuide
 );
 
+// GET /api/bookings/guide
 router.get('/guide', verifyToken, authorizeUser, cont.bookingContFetchGuideBookings);
+
+// GET /api/bookings/user
+router.get('/user', verifyToken, authorizeUser, cont.bookingContFetchUserBookings);
+
+router.get(
+  '/calendar/:guideId',
+  validateData(schemas.GUIDE_BOOKING_CALENDAR_ID_SCHEMA, 'params'),
+  validateData(schemas.GUIDE_BOOKINGS_CALENDAR_FETCH_SCHEMA, 'query'),
+  validators.validateDateRange,
+  cont.bookingContFetchGuideBookingCalendar
+);
+
+router.patch(
+  '/:bookingId/accept',
+  verifyToken,
+  authorizeUser,
+  validators.validateBookingBelongsToGuide,
+  cont.bookingContAcceptBooking
+);
+
+router.patch(
+  '/:bookingId/reject',
+  verifyToken,
+  authorizeUser,
+  validators.validateBookingBelongsToGuide,
+  cont.bookingContRejectBooking
+);
+
+router.delete(
+  '/:bookingId',
+  verifyToken,
+  authorizeUser,
+  validators.validateBookingBelongsToUser,
+  cont.bookingContDeleteBooking
+);
 
 export default router;

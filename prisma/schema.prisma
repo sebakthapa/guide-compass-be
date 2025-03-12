@@ -19,8 +19,8 @@ enum UserRole {
 
 enum BookingStatus {
   PENDING
-  CONFIRMED
-  CANCELLED
+  ACCEPTED
+  REJECTED
   COMPLETED
 }
 

@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import { BOOKING_STATUS } from './booking.config';
-import { PAGINATION_SCHEMA } from '../config/schema.constants';
+import { ID_SCHEMA, PAGINATION_SCHEMA } from '../config/schema.constants';
 
 export const GUIDE_BOOKING_SCHEMA = Joi.object({
   guideId: Joi.string().required(),
@@ -15,3 +15,12 @@ export const GUIDE_BOOKING_SCHEMA = Joi.object({
 export const GUIDE_BOOKINGS_FETCH_SCHEMA = Joi.object({
   status: Joi.string().valid(...BOOKING_STATUS),
 }).concat(PAGINATION_SCHEMA);
+
+export const GUIDE_BOOKINGS_CALENDAR_FETCH_SCHEMA = Joi.object({
+  from: Joi.date().iso().required(),
+  to: Joi.date().iso().required(),
+});
+
+export const GUIDE_BOOKING_CALENDAR_ID_SCHEMA = Joi.object({
+  guideId: ID_SCHEMA.required(),
+});

@@ -16,7 +16,8 @@ export const usersContUpdateDetails = catchAsyncFile(async (req: Request, res: R
     return sendFailureRes(StatusCodes.BAD_REQUEST)(res, `Invalid image received`)({});
   }
 
-  const uploadedFile = await uploadUserProfile(image.filepath, user?.id);
+  // TODO: delete previous profile image
+  const uploadedFile = await uploadUserProfile(image, user?.id);
   const imageUrl = uploadedFile.publicUrl();
 
   const updatedUser = await updateUserById(user.id, { ...data, imageUrl });

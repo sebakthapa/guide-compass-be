@@ -10,9 +10,6 @@ const router = Router();
 // GET /api/guides
 router.get('/', verifyToken, authorizeUser, cont.guideContFetchSelfDetails);
 
-// GET /api/guides/:guideId
-router.get('/:guideId', validateData(schemas.GUIDE_FETCH_SCHEMA, 'params'), cont.guideContFetchGuideDetailsById);
-
 // PATCH /api/guides/become-guide
 router.patch('/become-guide', verifyToken, authorizeUser, cont.guideContBecomeGuide);
 
@@ -34,5 +31,8 @@ router.get('/languages', cont.guideContFetchAllLanguages);
 
 // GET/api/guides/list
 router.post('/list', validateData(schemas.GUIDE_LIST_FETCH_SCHEMA), cont.guideContFetchGuidesList);
+
+// GET /api/guides/:guideId
+router.get('/:guideId', validateData(schemas.GUIDE_FETCH_SCHEMA, 'params'), cont.guideContFetchGuideDetailsById);
 
 export default router;

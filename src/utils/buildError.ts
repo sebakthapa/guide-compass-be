@@ -1,6 +1,7 @@
 import HttpStatus from 'http-status-codes';
 import { isEmpty } from 'lodash';
 import logger from './logger';
+import { Prisma } from '@prisma/client';
 
 /**
  * Build error response for validation errors.
@@ -36,11 +37,9 @@ export function buildError(err: ResponseError) {
   }
 
   // DB ERRORS
-  if (err.code) {
-    const code = typeof err.code === 'string' ? err.code : err.code.toString();
-    if (code.startsWith('235')) {
-      return handleDbError(code, err);
-    }
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    // Prisma duplicate key error
+    return handleDbError(err.code, err);
   }
 
   // Validation errors
@@ -100,33 +99,19 @@ export function buildError(err: ResponseError) {
   };
 }
 
-function handleDbError(code: string, err: ResponseError) {
-  let message = '';
-  if (code === '23502') {
-    message = `'${err.column}' should not be null`;
+function handleDbError(code: string, err: Prisma.PrismaClientKnownRequestError) {
+  // The meta field contains a target with the fields that violated the unique constraint
+  if (code === 'P2002') {
+    const target = err.meta?.target;
+    const fields = Array.isArray(target) ? target.join(', ') : target;
+    const message = `Unique constraint failed on the field(s): ${fields}`;
 
     return {
-      code: HttpStatus.INTERNAL_SERVER_ERROR,
+      code: HttpStatus.CONFLICT, // HTTP 409 Conflict
       message,
-      // details: [],
-    };
-  } else if (code === '23505') {
-    const regExp = /\(([^)]+)\)/g;
-    const matches = err.detail.match(regExp);
-    message = `${matches && matches[0]} with value ${matches && matches[1]} already exist`.replace(/["'()]/g, `'`);
-
-    return {
-      code: HttpStatus.INTERNAL_SERVER_ERROR,
-      message,
-    };
-  } else if (code === '23503') {
-    const matches = err.detail.match(/"(.*?)"/g);
-
-    return {
-      code: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: `${matches && matches[0]} doesnot exist`,
     };
   } else {
+    // Add more Prisma-specific error handling if needed
     return {
       code: HttpStatus.INTERNAL_SERVER_ERROR,
       message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),

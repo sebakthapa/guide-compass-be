@@ -46,11 +46,10 @@ model User {
   guide Guide?
 
   // Relations for bookings and reviews
-  bookingsAsCustomer  Booking[]           @relation("CustomerBookings")
-  bookingsAsGuide     Booking[]           @relation("GuideBookings")
-  reviewsAsCustomer   Review[]            @relation("CustomerReviews")
-  reviewsAsGuide      Review[]            @relation("GuideReviews")
-  guideAvailabilities GuideAvailability[]
+  bookingsAsCustomer Booking[] @relation("CustomerBookings")
+  bookingsAsGuide    Booking[] @relation("GuideBookings")
+  reviewsAsCustomer  Review[]  @relation("CustomerReviews")
+  reviewsAsGuide     Review[]  @relation("GuideReviews")
 }
 
 model Guide {
@@ -67,7 +66,8 @@ model Guide {
   verificationDocuments VerificationDocuments[]
 
   // Establish relation with User via the same ID
-  user User @relation(fields: [id], references: [id])
+  user     User      @relation(fields: [id], references: [id])
+  packages Package[] @relation("GuidePackages")
 }
 
 enum VerificationDocumentType {
@@ -207,14 +207,19 @@ model Review {
   customer User    @relation("CustomerReviews", fields: [customerId], references: [id])
 }
 
-model GuideAvailability {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  guideId       String   @db.ObjectId
-  availableDate DateTime
-  // Storing time as string (e.g., "09:00") because Prisma does not have a native time type for MongoDB.
-  startTime     String
-  endTime       String
-  isAvailable   Boolean  @default(true)
+model Package {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  currency    String   @default("USD")
+  duration    Int
+  location    String
+  guideId     String   @db.ObjectId
+  guide       Guide    @relation("GuidePackages", fields: [guideId], references: [id])
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  guide User @relation(fields: [guideId], references: [id])
+  @@unique([name, guideId])
+  @@unique([location, guideId])
 }

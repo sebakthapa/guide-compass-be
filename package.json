@@ -1,6 +1,7 @@
 {
   "scripts": {
     "dev": "nodemon",
+    "start:ngrok":"cross-env APP_PORT=8002 ts-node src/index.ts",
     "prepare": "husky",
     "migrate": "prisma db push",
     "lint": "eslint"

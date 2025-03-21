@@ -6,6 +6,10 @@ import { catchAsync } from '../utils/catchAsync';
 import { getUserById } from '../users/users.services';
 import { AUTH_TOKEN_COOKIE_NAME } from '../auth/auth.config';
 
+/**
+ * Adds user data to request
+ * returns error only incase of error
+ */
 export const verifyToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   try {
     let token = req.headers['authorization'] || req.cookies[AUTH_TOKEN_COOKIE_NAME];
@@ -28,6 +32,10 @@ export const verifyToken = catchAsync(async (req: Request, res: Response, next: 
   }
 });
 
+/**
+ * Authorizes the existence of user
+ * returns 401 if doesn't exist
+ */
 export const authorizeUser = catchAsync((req: Request, res: Response, next: NextFunction) => {
   const id = req.decoded?.id;
 

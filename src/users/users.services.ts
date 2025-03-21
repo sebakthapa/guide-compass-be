@@ -3,6 +3,8 @@ import prisma from '../db';
 import { isEmail } from './users.utils';
 import { uploadToBucket } from '../utils/gcloud';
 import { USER_PROFILE_IMAGE_FOLDER } from './user.config';
+import { File } from 'formidable';
+import path from 'path';
 
 export const createUser = async (data: Prisma.UserCreateInput) => {
   const createdUser = await prisma.user.create({ data });
@@ -73,9 +75,11 @@ export const changeUserRole = (id: string, role: UserRole) => {
   });
 };
 
-export const uploadUserProfile = async (imagePath: string, userId: string) => {
-  const [file] = await uploadToBucket(imagePath, {
-    destination: `${USER_PROFILE_IMAGE_FOLDER}/${userId}_${Date.now()}`,
+export const uploadUserProfile = async (image: File, userId: string) => {
+  const destImageName = `${USER_PROFILE_IMAGE_FOLDER}/${userId}_${image.newFilename}${path.extname(image.originalFilename || '')}`;
+
+  const [file] = await uploadToBucket(image.filepath, {
+    destination: destImageName,
   });
 
   return file;

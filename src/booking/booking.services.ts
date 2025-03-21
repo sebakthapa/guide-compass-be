@@ -28,12 +28,22 @@ export const fetchBookingById = (id: string) => {
 export const fetchGuideBookingsWithFilters = (guideId: string, filters: GuideBookingFetchReqBody) => {
   const { status, page = 1, limit = 15 } = filters;
 
-  return prisma.booking.findMany({ where: { status, guideId }, skip: (page - 1) * limit, take: limit });
+  return prisma.booking.findMany({
+    where: { status, guideId },
+    skip: (page - 1) * limit,
+    take: limit,
+    include: { customer: { omit: { password: true } }, guide: { omit: { password: true } } },
+  });
 };
 export const fetchUserBookingsWithFilters = (customerId: string, filters: GuideBookingFetchReqBody) => {
   const { status, page = 1, limit = 15 } = filters;
 
-  return prisma.booking.findMany({ where: { status, customerId }, skip: (page - 1) * limit, take: limit });
+  return prisma.booking.findMany({
+    where: { status, customerId },
+    skip: (page - 1) * limit,
+    take: limit,
+    include: { customer: { omit: { password: true } }, guide: { omit: { password: true } } },
+  });
 };
 
 export const fetchGuideBookingCalendarDates = async (

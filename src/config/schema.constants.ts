@@ -5,4 +5,4 @@ export const PAGINATION_SCHEMA = Joi.object({
   limit: Joi.number().integer().min(1),
 });
 
-export const ID_SCHEMA = Joi.string().length(24);
+export const ID_SCHEMA = Joi.string().hex().length(24);

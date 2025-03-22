@@ -5,6 +5,7 @@ import { sendFailureRes } from '../utils/formatResponse';
 import { catchAsync } from '../utils/catchAsync';
 import { getUserById } from '../users/users.services';
 import { AUTH_TOKEN_COOKIE_NAME } from '../auth/auth.config';
+import { UserRole } from '@prisma/client';
 
 /**
  * Adds user data to request
@@ -22,6 +23,12 @@ export const verifyToken = catchAsync(async (req: Request, res: Response, next: 
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as jwt.JwtPayload;
     const id = decoded.id;
     const user = await getUserById(id);
+
+    if (user) {
+      if (user.isBanned) {
+        return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'You are banned')({});
+      }
+    }
 
     // @ts-expect-error password doesn't exist on req.decoded
     req.decoded = { ...user, password: undefined };
@@ -45,3 +52,22 @@ export const authorizeUser = catchAsync((req: Request, res: Response, next: Next
 
   return next();
 });
+
+/**
+ * Authorizes the existence of user
+ * returns 401 if doesn't exist
+ */
+export const authorizeUserRole = (role: UserRole) =>
+  catchAsync((req: Request, res: Response, next: NextFunction) => {
+    const user = req.decoded;
+
+    if (!user?.id) {
+      return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'You must be logged in to continue')({});
+    }
+
+    if (user?.role === role) {
+      return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, `Only ${role} can perform this action`);
+    }
+
+    return next();
+  });

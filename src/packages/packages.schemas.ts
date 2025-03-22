@@ -6,6 +6,7 @@ export const PACKAGE_CREATE_SCHEMA = Joi.object({
   description: Joi.string().min(10).max(1000).required(),
   currency: Joi.string().valid('USD', 'NPR', 'EUR', 'INR').default('USD'), // Add more as needed
   duration: Joi.number().integer().min(1).required(), // Duration in days
+  price: Joi.number().integer().min(1).required(), // Duration in days
   location: Joi.string().min(3).max(200).required(),
   // images: Joi.array().items(Joi.string().uri()).max(10), // Max 10 image URLs
 });

@@ -18,7 +18,7 @@ export const upsertGuideDetailsById = async (data: Partial<GuideDetailsUpdateVal
     location: data.location,
   };
 
-  const creatingDetails: Prisma.GuideCreateInput = {
+  const creatingDetails: Prisma.GuideUpsertArgs['create'] = {
     bio: data.bio,
     dailyRate: data.dailyRate,
     expertises: data.expertises,
@@ -66,14 +66,19 @@ export const fetchUserWithGuideDetails = (id: string) => {
   return prisma.user.findFirst({ where: { id }, include: { guide: true } });
 };
 
-export const fetchGuideDetailsById = (id: string) => {
+export const fetchGuideDetailsById = (id: string, includeBannedGuide = false) => {
   return prisma.guide.findFirst({
-    where: { id },
-    include: { user: { select: { fullname: true, image: true, username: true } } },
+    where: {
+      id,
+      user: {
+        isBanned: includeBannedGuide ? undefined : false,
+      },
+    },
+    include: { user: { select: { fullname: true, image: true, username: true } }, packages: true },
   });
 };
 
-export const fetchGuideListWithPagination = async (filters: GuideListFetchFilters) => {
+export const fetchGuideListWithPagination = async (filters: GuideListFetchFilters, fetchOnlyBannedGuides = false) => {
   const { expertises, geoLocation, limit = 15, location, page = 1, address } = filters;
 
   // Start with an empty pipeline
@@ -169,9 +174,12 @@ export const fetchGuideListWithPagination = async (filters: GuideListFetchFilter
         fullname: 1,
         username: 1,
         image: 1,
+        isBanned: 1,
       },
     },
   });
+
+  pipeline.push({ $match: { 'user.isBanned': fetchOnlyBannedGuides } });
 
   pipeline.push({ $sort: { createdAt: -1 } });
 

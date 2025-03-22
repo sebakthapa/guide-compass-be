@@ -62,8 +62,9 @@ export const guideContFetchGuidesList = catchAsync(async (req: Request, res: Res
 
 export const guideContFetchGuideDetailsById = catchAsync(async (req: Request, res: Response) => {
   const { guideId } = req.params;
+  const fetcingUser = req.decoded;
 
-  const details = await services.fetchGuideDetailsById(guideId);
+  const details = await services.fetchGuideDetailsById(guideId, fetcingUser?.role === 'ADMIN');
 
   if (!details) {
     return sendFailureRes(StatusCodes.BAD_REQUEST)(res, 'Guide does not exist')({});

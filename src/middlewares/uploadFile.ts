@@ -7,10 +7,6 @@ import { badRequest } from '@hapi/boom';
 
 export const uploadFile = (uploadType = 'image', multiples = true) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!!req.headers['content-type'] && req.headers['content-type']?.startsWith('multipart/form-data')) {
-      throw badRequest(`Request body must be form data`);
-    }
-
     try {
       const form = formidable({
         uploadDir: `${PUBLIC_PATH}/temp/${Date.now()}`,

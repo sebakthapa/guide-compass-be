@@ -11,7 +11,7 @@ export const createPackage = (
   imageUrl: string
 ) => {
   return prisma.package.create({
-    data: { ...creatingData, guideId, duration: +creatingData.duration, image: imageUrl },
+    data: { ...creatingData, guideId, duration: +creatingData.duration, price: +creatingData.price, image: imageUrl },
   });
 };
 export const updatePackage = (packageId: string, updatingData: Prisma.PackageUpdateInput) => {

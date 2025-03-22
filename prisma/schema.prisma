@@ -41,6 +41,7 @@ model User {
   image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isBanned  Boolean  @default(false)
 
   // Optional one-to-one relation for guide profile
   guide Guide?
@@ -212,6 +213,7 @@ model Package {
   name        String
   description String
   currency    String   @default("USD")
+  price       Float
   duration    Int
   location    String
   guideId     String   @db.ObjectId

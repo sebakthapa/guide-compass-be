@@ -23,6 +23,7 @@ router.post(
 router.get(
   '/guide/:guideId',
   validateData(schemas.GUIDE_PACKAGES_FETCH_SCHEMA, 'params'),
+  validators.validatePackagesFetch,
   cont.packagesContFetchGuidePackages
 );
 
@@ -35,6 +36,14 @@ router.patch(
   validateData(schemas.PACKAGE_UPDATE_PARAMS_SCHEMA, 'params'),
   validators.validateUpdatePackage,
   cont.packagesContEditGuidePackage
+);
+router.patch(
+  '/:packageId',
+  verifyToken,
+  authorizeUser,
+  validateData(schemas.PACKAGE_DELETE_PARAMS_SCHEMA, 'params'),
+  validators.validatePackageDelete,
+  cont.packagesContDeleteGuidePackage
 );
 
 export default router;

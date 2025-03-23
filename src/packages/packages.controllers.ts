@@ -43,3 +43,11 @@ export const packagesContEditGuidePackage = catchAsync(async (req: Request, res:
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Package edited successfully')(updatedData);
 });
+
+export const packagesContDeleteGuidePackage = catchAsync(async (req: Request, res: Response) => {
+  const { packageId } = req.params;
+
+  const deletedData = await services.deletePackageById(packageId);
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Package edited successfully')(deletedData);
+});

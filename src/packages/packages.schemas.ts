@@ -19,6 +19,9 @@ export const PACKAGE_UPDATE_SCHEMA = PACKAGE_CREATE_SCHEMA.fork(
 export const PACKAGE_UPDATE_PARAMS_SCHEMA = Joi.object({
   packageId: ID_SCHEMA.required(),
 });
+export const PACKAGE_DELETE_PARAMS_SCHEMA = Joi.object({
+  packageId: ID_SCHEMA.required(),
+});
 export const GUIDE_PACKAGES_FETCH_SCHEMA = Joi.object({
   guideId: ID_SCHEMA.required(),
 });

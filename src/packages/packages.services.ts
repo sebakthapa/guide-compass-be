@@ -20,6 +20,11 @@ export const updatePackage = (packageId: string, updatingData: Prisma.PackageUpd
     where: { id: packageId },
   });
 };
+export const deletePackageById = (packageId: string) => {
+  return prisma.package.delete({
+    where: { id: packageId },
+  });
+};
 
 export const fetchGuidePackages = (guideId: string) => {
   return prisma.package.findMany({ where: { guideId } });

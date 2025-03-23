@@ -80,7 +80,7 @@ export const fetchGuideDetailsById = (id: string, includeBannedGuide = false) =>
 };
 
 export const fetchGuideListWithPagination = async (filters: GuideListFetchFilters, fetchOnlyBannedGuides = false) => {
-  const { expertises, geoLocation, limit = 15, location, page = 1, address } = filters;
+  const { expertises, geoLocation, limit = 15, location, page = 1, address } = filters || {};
 
   // Start with an empty pipeline
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

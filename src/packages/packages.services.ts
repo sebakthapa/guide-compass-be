@@ -14,9 +14,14 @@ export const createPackage = (
     data: { ...creatingData, guideId, duration: +creatingData.duration, price: +creatingData.price, image: imageUrl },
   });
 };
+
 export const updatePackage = (packageId: string, updatingData: Prisma.PackageUpdateInput) => {
   return prisma.package.update({
-    data: { ...updatingData },
+    data: {
+      ...updatingData,
+      duration: updatingData.duration ? +updatingData.duration : undefined,
+      price: updatingData.price ? +updatingData.price : undefined,
+    },
     where: { id: packageId },
   });
 };

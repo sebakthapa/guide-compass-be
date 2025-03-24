@@ -29,7 +29,6 @@ export const upsertGuideDetailsById = async (data: Partial<GuideDetailsUpdateVal
     // @ts-expect-error sth
     location: data.location,
     user: { connect: { id: guideId } },
-    id: guideId,
   };
 
   if (data.fullname) {

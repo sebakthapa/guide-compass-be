@@ -37,7 +37,7 @@ router.patch(
   validators.validateUpdatePackage,
   cont.packagesContEditGuidePackage
 );
-router.patch(
+router.delete(
   '/:packageId',
   verifyToken,
   authorizeUser,

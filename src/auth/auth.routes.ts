@@ -32,4 +32,19 @@ router.get('/session', verifyToken, cont.authContGetSession);
 // GET /api/logout
 router.get('/logout', cont.authContLogout);
 
+router.get(
+  '/signup/resend-otp',
+  validateZodSchema(schemas.RESEND_OTP_SCHEMA),
+  validators.validateResendSignupOtp,
+  cont.authContResendSignupOtp
+);
+
+router.get(
+  '/reset-password/otp',
+  validateZodSchema(schemas.RESET_PASSWORD_OTP_SCHEMA),
+  validators.validateResetPasswordInitiate,
+  cont.authContSendResetPasswordOtp
+);
+router.patch('/reset-password', validateZodSchema(schemas.RESET_PASSWORD_SCHEMA), cont.authContResetPassword);
+
 export default router;

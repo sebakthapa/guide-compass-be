@@ -2,10 +2,9 @@ import { Router } from 'express';
 import * as cont from './users.controllers';
 import { uploadFile } from '../middlewares/uploadFile';
 import { authorizeUser, verifyToken } from '../middlewares/verifyToken';
-import { validateData } from '../middlewares/validateData';
-import { USER_UPDATE_SCHEMA } from './users.schemas';
-import { validateImageForUserupdate } from './users.validators';
-// import * as cont from './users.controllers';
+import { validateData, validateZodSchema } from '../middlewares/validateData';
+import * as schemas from './users.schemas';
+import * as validators from './users.validators';
 
 const router = Router();
 
@@ -14,10 +13,17 @@ router.patch(
   verifyToken,
   authorizeUser,
   uploadFile('image', false),
-  validateData(USER_UPDATE_SCHEMA),
-  validateImageForUserupdate,
-
+  validateData(schemas.USER_UPDATE_SCHEMA),
+  validators.validateImageForUserupdate,
   cont.usersContUpdateDetails
+);
+
+router.patch(
+  '/change-password',
+  verifyToken,
+  authorizeUser,
+  validateZodSchema(schemas.CHANGE_PASSWORD_SCHEMA),
+  cont.userContChangePassword
 );
 
 export default router;

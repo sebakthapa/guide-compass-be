@@ -43,10 +43,12 @@ export const updateUserById = (
     fullname,
     imageUrl,
     username,
+    password,
   }: {
     username?: string;
     fullname?: string;
     imageUrl?: string;
+    password?: string;
   }
 ) => {
   const updatingDetails: Record<string, string> = {};
@@ -58,6 +60,9 @@ export const updateUserById = (
   }
   if (imageUrl) {
     updatingDetails.image = imageUrl;
+  }
+  if (password) {
+    updatingDetails.password = password;
   }
 
   return prisma.user.update({

@@ -8,7 +8,7 @@ import { decryptData, encryptData } from '../utils/encryption';
 import { generateOtp, sendOtpMail, verifyOtp } from './auth.services';
 import { addIntoVerificationCode } from '../verificationCode/verificationTokens.services';
 import { AUTH_TOKEN_COOKIE_NAME, SIGNUP_OTP_IDENTIFIER } from './auth.config';
-import { createUser, getUserByIdentifier } from '../users/users.services';
+import { createUser, getUserByEmail, getUserByIdentifier, updateUserById } from '../users/users.services';
 import { generateToken } from '../utils/generateToken';
 import { isEmpty } from 'lodash';
 
@@ -22,7 +22,7 @@ export const authContValidateSignpRequest = catchAsync(async (req: Request, res:
   const encryptedData = encryptData(JSON.stringify(finalData));
 
   const otp = generateOtp();
-  await sendOtpMail(otp, data.email);
+  await sendOtpMail(otp, data.email, 'signup');
   await addIntoVerificationCode({ otp, identifier: finalData[SIGNUP_OTP_IDENTIFIER], type: 'SIGNIN' });
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Signup successfull')({ token: encryptedData });
@@ -41,7 +41,7 @@ export const authContVerifysignUpOtp = catchAsync(async (req: Request, res: Resp
     return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid Data provided')({});
   }
 
-  const isOtpCorrect = await verifyOtp(otp, userData[SIGNUP_OTP_IDENTIFIER]);
+  const isOtpCorrect = await verifyOtp(otp, userData[SIGNUP_OTP_IDENTIFIER], 'SIGNIN');
 
   if (!isOtpCorrect) {
     return sendFailureRes(StatusCodes.OK)(res, 'Incorrect/Expired OTP')({});
@@ -91,4 +91,54 @@ export const authContGetSession = catchAsync((req: Request, res: Response) => {
   const user = req.decoded!;
 
   return sendSuccessRes(StatusCodes.OK)(res, 'User Session retrieved')(user);
+});
+
+export const authContResendSignupOtp = catchAsync(async (req: Request, res: Response) => {
+  const { token } = req.body as VerifyOtpRequestBody;
+
+  let userData: SignupRequestBody | null = null;
+
+  try {
+    userData = JSON.parse(decryptData(token)) as SignupRequestBody;
+    // eslint-disable-next-line no-empty
+  } catch {}
+  if (!userData) {
+    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid Data provided')({});
+  }
+
+  const otp = generateOtp();
+  await sendOtpMail(otp, userData.email, 'signup');
+  await addIntoVerificationCode({ otp, identifier: userData[SIGNUP_OTP_IDENTIFIER], type: 'SIGNIN' });
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'New OTP sent')({});
+});
+
+export const authContSendResetPasswordOtp = catchAsync(async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  const otp = generateOtp();
+  await sendOtpMail(otp, email, 'reset-password');
+  await addIntoVerificationCode({ otp, identifier: email, type: 'FORGOT_PASSWORD' });
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'OTP sent to provided email')({});
+});
+export const authContResetPassword = catchAsync(async (req: Request, res: Response) => {
+  const { otp, email, password } = req.body;
+
+  const isOtpCorrect = await verifyOtp(otp, email, 'FORGOT_PASSWORD');
+
+  if (!isOtpCorrect) {
+    return sendFailureRes(StatusCodes.OK)(res, 'Incorrect/Expired OTP')({});
+  }
+
+  const user = await getUserByEmail(email);
+
+  if (!user) {
+    return sendFailureRes(StatusCodes.NOT_FOUND)(res, 'User does not exist with the provided email')({});
+  }
+
+  const hashedPassword = await hashPassword(password);
+  await updateUserById(user.id, { password: hashedPassword });
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Password reset successful')({});
 });

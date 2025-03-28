@@ -19,7 +19,7 @@ export const deleteVerificationCode = (identifier: string, otp: string) => {
 };
 
 export const getVerificationCodeByIdentifier = (identifier: string, type: VerificationCodeType) => {
-  return prisma.verificationCode.findMany({ where: { identifier, type }, select: { otp: true, expires: true } });
+  return prisma.verificationCode.findMany({ where: { identifier, type } });
 };
 
 export const getVerificationCode = (otp: string, identifier: string, type: VerificationCodeType) => {

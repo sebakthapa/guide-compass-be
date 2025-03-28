@@ -156,6 +156,8 @@ model VerificationCode {
   identifier String
   expires    DateTime             @db.Timestamp
   type       VerificationCodeType
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
 
   @@unique([otp, identifier])
 }

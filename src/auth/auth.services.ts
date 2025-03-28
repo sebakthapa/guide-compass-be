@@ -3,13 +3,14 @@ import { isEmpty } from 'lodash';
 import { badRequest, unauthorized } from '@hapi/boom';
 import { mailTransporter } from '../utils/sendMail';
 import { deleteVerificationCode, getVerificationCode } from '../verificationCode/verificationTokens.services';
+import { VerificationCodeType } from '@prisma/client';
 
 export const generateOtp = () => {
   return crypto.randomInt(100000, 999999).toString();
 };
 
-export const verifyOtp = async (otp: string, identifier: string) => {
-  const token = await getVerificationCode(otp, identifier, 'SIGNIN');
+export const verifyOtp = async (otp: string, identifier: string, otpType: VerificationCodeType) => {
+  const token = await getVerificationCode(otp, identifier, otpType);
   if (isEmpty(token)) {
     throw badRequest('Incorrect OTP');
   }
@@ -32,9 +33,9 @@ export const verifyOtp = async (otp: string, identifier: string) => {
   return true;
 };
 
-export const sendOtpMail = (otp: string, email: string) => {
+export const sendOtpMail = (otp: string, email: string, purpose: string) => {
   return mailTransporter.sendMail({
-    text: `Your OTP is ${otp}`,
+    text: `Your ${purpose} OTP is ${otp}`,
     to: email,
     from: 'Guide Compass accounts@guidecompass.com',
     subject: 'GuideCompass OTP Code',

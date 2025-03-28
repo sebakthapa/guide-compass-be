@@ -1,4 +1,5 @@
 import { CertificationType, GuideExperience, LocationType } from '@prisma/client';
+import { GUIDE_DOCUMENT_ADD_SCHEMA } from '../guide/guide.schemas';
 
 export interface GuideDetailsUpdateReqBody {
   bio?: string;
@@ -46,3 +47,5 @@ export type GuideListFetchFilters = Partial<{
   address: string;
   expertises: string[];
 }>;
+
+export type AddGuideDocumentBody = Zod.infer<typeof GUIDE_DOCUMENT_ADD_SCHEMA>;

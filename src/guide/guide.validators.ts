@@ -7,6 +7,7 @@ import { StatusCodes } from 'http-status-codes';
 import { GuideDetailsUpdateValidatedReqBody } from '../types/guide.types';
 import { uniq } from 'lodash';
 import { getCoordinates } from '../utils/geocoding';
+import prisma from '../db';
 
 export const validateDetailsUpdateRequest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const updatingData = req.body as Guide;
@@ -73,6 +74,24 @@ export const validateDetailsUpdateRequest = catchAsync(async (req: Request, res:
   const finalUpdatingData = { ...updatingData, ...verifiedUpdatingData };
 
   req.body = finalUpdatingData;
+
+  return next();
+});
+
+export const validateGuideDocumentDelete = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id as unknown as string;
+  const user = req.decoded!;
+  if (!user.guideId) {
+    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'You must be guide to perform this action')({});
+  }
+
+  const data = await prisma.verificationDocuments.findFirst({ where: { guideId: user.guideId, id } });
+
+  if (!data) {
+    return sendFailureRes(StatusCodes.NOT_FOUND)(res, `The requested document doesn't exist or doesn't belong to you`)(
+      {}
+    );
+  }
 
   return next();
 });

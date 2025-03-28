@@ -1,9 +1,12 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, VerificationDocumentType, VerificationStatus } from '@prisma/client';
 import prisma from '../db';
 import { GuideDetailsUpdateValidatedReqBody, GuideListFetchFilters } from '../types/guide.types';
 import { getCoordinates } from '../utils/geocoding';
 import { badRequest } from '@hapi/boom';
 import { AnyObject } from '../types';
+import { File } from 'formidable';
+import path from 'path';
+import { deleteFromBucket, getPathFromPublicUrl, resolveGcloudDestPath, uploadToBucket } from '../utils/gcloud';
 
 export const upsertGuideDetailsById = async (data: Partial<GuideDetailsUpdateValidatedReqBody>, guideId: string) => {
   const updatingDetails: Prisma.GuideUpdateInput = {
@@ -29,6 +32,7 @@ export const upsertGuideDetailsById = async (data: Partial<GuideDetailsUpdateVal
     // @ts-expect-error sth
     location: data.location,
     user: { connect: { id: guideId } },
+    verification: { status: 'PENDING' },
   };
 
   if (data.fullname) {
@@ -58,12 +62,16 @@ export const upsertGuideDetailsById = async (data: Partial<GuideDetailsUpdateVal
 export const fetchExpertiseList = () => {
   return prisma.expertise.findMany();
 };
+
 export const fetchLanguagesList = () => {
   return prisma.language.findMany();
 };
 
-export const fetchUserWithGuideDetails = (id: string) => {
-  return prisma.user.findFirst({ where: { id }, include: { guide: true } });
+export const fetchUserWithGuideDetails = (id: string, includeVerificationDocuments = false) => {
+  return prisma.user.findFirst({
+    where: { id },
+    include: { guide: { include: { verificationDocuments: includeVerificationDocuments, packages: true } } },
+  });
 };
 
 export const fetchGuideDetailsById = (id: string, includeBannedGuide = false) => {
@@ -179,7 +187,7 @@ export const fetchGuideListWithPagination = async (filters: GuideListFetchFilter
     },
   });
 
-  pipeline.push({ $match: { 'user.isBanned': fetchOnlyBannedGuides } });
+  pipeline.push({ $match: { 'user.isBanned': fetchOnlyBannedGuides, 'verification.status': 'VERIFIED' } });
 
   pipeline.push({ $sort: { createdAt: -1 } });
 
@@ -194,4 +202,77 @@ export const fetchGuideListWithPagination = async (filters: GuideListFetchFilter
 
     return { ...user, ...guideDetails };
   });
+};
+
+export const fetchGuideDetailsByVerificationStatus = async (
+  verificationStatus: VerificationStatus,
+  {
+    limit = 10,
+    page = 1,
+    onlyGuidesHavingAllDetails = false,
+  }: {
+    page?: number;
+    limit?: number;
+    onlyGuidesHavingAllDetails?: boolean;
+  }
+) => {
+  const havingAllDetailsWhereFilter = onlyGuidesHavingAllDetails
+    ? ({
+        bio: { isSet: true },
+        certifications: { isSet: true },
+        experiences: { isSet: true },
+        expertises: { isEmpty: false },
+        languages: { isEmpty: false },
+        location: { isSet: true },
+        tagline: { isSet: true },
+      } as Prisma.GuideWhereInput)
+    : {};
+
+  const userRes = await prisma.user.findMany({
+    where: {
+      role: 'GUIDE',
+      guide: {
+        ...havingAllDetailsWhereFilter,
+        verification: { status: verificationStatus },
+      },
+    },
+    include: { guide: true },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+
+  return userRes?.map((el) => {
+    const { guide, ...user } = el;
+
+    return { ...guide, ...user };
+  });
+};
+
+export const changeGuideVerificationStatus = (guideId: string, status: VerificationStatus, remarks?: string) => {
+  return prisma.guide.update({ where: { id: guideId }, data: { verification: { status, remarks } } });
+};
+
+export const addGuideDocument = async (guideId: string, document: File, type: VerificationDocumentType) => {
+  const imageName = `${guideId}_${document.newFilename}${path.extname(document.originalFilename || '')}`;
+  const [file] = await uploadToBucket(document.filepath, {
+    destination: resolveGcloudDestPath('guideDocument', imageName),
+  });
+
+  const uploadedDocument = await prisma.verificationDocuments.create({
+    data: { fileUrl: file.publicUrl(), type, guideId },
+  });
+
+  return uploadedDocument;
+};
+
+export const removeGuideDocument = async (documentId: string) => {
+  const docDetails = await prisma.verificationDocuments.findFirst({ where: { id: documentId } });
+
+  if (!docDetails) {
+    return null;
+  }
+
+  await deleteFromBucket(getPathFromPublicUrl(docDetails.fileUrl));
+
+  return prisma.verificationDocuments.delete({ where: { id: documentId } });
 };

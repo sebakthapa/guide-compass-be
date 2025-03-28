@@ -28,14 +28,16 @@ export const authContValidateSignpRequest = catchAsync(async (req: Request, res:
   return sendSuccessRes(StatusCodes.OK)(res, 'Signup successfull')({ token: encryptedData });
 });
 
-export const authContVerifyOtp = catchAsync(async (req: Request, res: Response) => {
+export const authContVerifysignUpOtp = catchAsync(async (req: Request, res: Response) => {
   const { otp, token } = req.body as VerifyOtpRequestBody;
 
   let userData: SignupRequestBody | null = null;
 
   try {
     userData = JSON.parse(decryptData(token)) as SignupRequestBody;
-  } catch (error) {
+    // eslint-disable-next-line no-empty
+  } catch {}
+  if (!userData) {
     return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid Data provided')({});
   }
 
@@ -45,7 +47,7 @@ export const authContVerifyOtp = catchAsync(async (req: Request, res: Response) 
     return sendFailureRes(StatusCodes.OK)(res, 'Incorrect/Expired OTP')({});
   }
 
-  const createdUser = await createUser({ ...userData, role: 'USER' });
+  const createdUser = await createUser({ ...userData });
 
   const userdetailsWithoutPassword = { ...createdUser, password: undefined };
 

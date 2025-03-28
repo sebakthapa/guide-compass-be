@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../db';
-import { uploadToBucket } from '../utils/gcloud';
-import { PACKAGE_IMAGE_FOLDER } from './packages.configs';
+import { resolveGcloudDestPath, uploadToBucket } from '../utils/gcloud';
 import { File } from 'formidable';
 import path from 'path';
 
@@ -60,10 +59,10 @@ export const doesPackageAlreadyExist = async (guideId: string, location: string,
 };
 
 export const uploadPackageImage = async (image: File, anyId: string) => {
-  const destImageName = `${PACKAGE_IMAGE_FOLDER}/${anyId}_${image.newFilename}${path.extname(image.originalFilename || '')}`;
+  const imageName = `${anyId}_${image.newFilename}${path.extname(image.originalFilename || '')}`;
 
   const [file] = await uploadToBucket(image.filepath, {
-    destination: destImageName,
+    destination: resolveGcloudDestPath('package', imageName),
   });
 
   return file;

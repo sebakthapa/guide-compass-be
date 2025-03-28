@@ -1,0 +1,2 @@
+export const GUIDE_VERIFICATION_STATUS = ['PENDING', 'REJECTED', 'VERIFIED'] as const;
+export const GUIDE_DOCUMENT_TYPES = ['CITIZENSHIP', 'LICENSE', 'PASSPORT'] as const;

@@ -16,6 +16,7 @@ import './types/request.types';
 import env from './env';
 import { createServer } from 'node:http';
 import helmet from 'helmet';
+import './config/zod.config';
 
 export const app = express();
 

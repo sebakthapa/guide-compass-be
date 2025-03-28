@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as schemas from './auth.schemas';
 import * as cont from './auth.controllers';
 import * as validators from './auth.validators';
-import { validateData } from '../middlewares/validateData';
+import { validateZodSchema } from '../middlewares/validateData';
 import { verifyToken } from '../middlewares/verifyToken';
 
 const router = Router();
@@ -10,7 +10,7 @@ const router = Router();
 // POST /api/auth/sigup
 router.post(
   '/signup',
-  validateData(schemas.SIGNUP_SCHEMA),
+  validateZodSchema(schemas.SIGNUP_SCHEMA),
   validators.validateDuplicateDataForSignup,
   cont.authContValidateSignpRequest
 );
@@ -18,13 +18,13 @@ router.post(
 // POST /signup/verify-otp
 router.post(
   '/signup/verify-otp',
-  validateData(schemas.OPT_VERIFICATION_SCHEMA),
+  validateZodSchema(schemas.OPT_VERIFICATION_SCHEMA),
   validators.validateDuplicateDataForSignupOtpVerification,
-  cont.authContVerifyOtp
+  cont.authContVerifysignUpOtp
 );
 
 // POST /api/login
-router.post('/login', validateData(schemas.LOGIN_SCHEMA), cont.authContLogin);
+router.post('/login', validateZodSchema(schemas.LOGIN_SCHEMA), cont.authContLogin);
 
 // GET /api/login
 router.get('/session', verifyToken, cont.authContGetSession);

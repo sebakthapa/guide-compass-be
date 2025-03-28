@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "nodemon",
-    "start:ngrok":"cross-env APP_PORT=8002 ts-node src/index.ts",
+    "start:ngrok": "cross-env APP_PORT=8002 ts-node src/index.ts",
     "prepare": "husky",
     "migrate": "prisma db push",
     "lint": "eslint"
@@ -55,9 +55,11 @@
     "nodemailer": "^6.9.16",
     "redis": "^4.7.0",
     "serve-favicon": "^2.5.0",
+    "sharp": "^0.33.5",
     "ts-node": "^10.9.2",
     "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",

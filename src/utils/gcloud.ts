@@ -1,11 +1,29 @@
 import { Storage, TransferManager, UploadOptions } from '@google-cloud/storage';
 import path from 'path';
-import { GCLOUD_BUCKET_NAME, GCLOUD_KEY_FILE_PATH } from '../config/gcloud.config';
+import {
+  GCLOUD_BASE_FOLDER,
+  GCLOUD_BUCKET_NAME,
+  GCLOUD_INTERMEDIATE_FOLDERS,
+  GCLOUD_KEY_FILE_PATH,
+  GCLOUD_PUBLIC_URL_BASE,
+} from '../config/gcloud.config';
+import { DeleteOptions } from '@google-cloud/storage/build/cjs/src/nodejs-common/service-object';
 
 export const getStorage = () => {
   return new Storage({
     keyFilename: path.join(GCLOUD_KEY_FILE_PATH),
   });
+};
+
+export const resolveGcloudDestPath = (
+  intermediateFolder: keyof typeof GCLOUD_INTERMEDIATE_FOLDERS,
+  filename: string
+) => {
+  return `${GCLOUD_BASE_FOLDER}/${GCLOUD_INTERMEDIATE_FOLDERS[intermediateFolder]}/${filename}`;
+};
+
+export const getPathFromPublicUrl = (publicUrl: string) => {
+  return decodeURIComponent(publicUrl).replace(GCLOUD_PUBLIC_URL_BASE + '/', '');
 };
 
 export const getBucket = () => getStorage().bucket(GCLOUD_BUCKET_NAME);
@@ -15,6 +33,11 @@ export const uploadToBucket = (localpath: string, options?: UploadOptions) => {
   const bucket = getBucket();
 
   return bucket.upload(localpath, options);
+};
+export const deleteFromBucket = (localpath: string, options?: DeleteOptions) => {
+  const bucket = getBucket();
+
+  return bucket.file(localpath).delete(options);
 };
 
 export const batchUploadToBucket = (folderPath: string) => {

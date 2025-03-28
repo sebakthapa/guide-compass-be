@@ -1,13 +1,15 @@
 import { Prisma, User, UserRole } from '@prisma/client';
 import prisma from '../db';
 import { isEmail } from './users.utils';
-import { uploadToBucket } from '../utils/gcloud';
-import { USER_PROFILE_IMAGE_FOLDER } from './user.config';
+import { resolveGcloudDestPath, uploadToBucket } from '../utils/gcloud';
 import { File } from 'formidable';
 import path from 'path';
 
 export const createUser = async (data: Prisma.UserCreateInput) => {
-  const createdUser = await prisma.user.create({ data });
+  const guideData: Partial<Prisma.UserCreateInput> =
+    data.role === 'GUIDE' ? { guide: { create: { verification: { status: 'PENDING' } } } } : {};
+
+  const createdUser = await prisma.user.create({ data: { ...data, ...guideData } });
 
   // @ts-expect-error password can't be placed as it is ommitted
   const returningUser: Omit<User, 'password'> = { ...createdUser, password: undefined };
@@ -76,10 +78,10 @@ export const changeUserRole = (id: string, role: UserRole) => {
 };
 
 export const uploadUserProfile = async (image: File, userId: string) => {
-  const destImageName = `${USER_PROFILE_IMAGE_FOLDER}/${userId}_${image.newFilename}${path.extname(image.originalFilename || '')}`;
+  const imageName = `${userId}_${image.newFilename}${path.extname(image.originalFilename || '')}`;
 
   const [file] = await uploadToBucket(image.filepath, {
-    destination: destImageName,
+    destination: resolveGcloudDestPath('profile', imageName),
   });
 
   return file;

@@ -1,5 +1,7 @@
 import Joi from 'joi';
-import { PAGINATION_SCHEMA } from '../config/schema.constants';
+import { ID_SCHEMA, PAGINATION_SCHEMA } from '../config/schema.constants';
+import { z } from 'zod';
+import { GUIDE_DOCUMENT_TYPES } from './guide.config';
 
 export const FETCH_BY_ID = Joi.object({
   id: Joi.number().required().integer(),
@@ -67,4 +69,12 @@ export const GUIDE_FETCH_SCHEMA = Joi.object({
     'string.length': 'Invalid ID. Please send a valid Guide ID',
     'any.required': 'Guide ID is required.',
   }),
+});
+
+export const GUIDE_DOCUMENT_ADD_SCHEMA = z.object({
+  type: z.enum(GUIDE_DOCUMENT_TYPES),
+});
+
+export const GUIDE_DOCUMENT_DELETE_SCHEMA = Joi.object({
+  id: ID_SCHEMA.required(),
 });

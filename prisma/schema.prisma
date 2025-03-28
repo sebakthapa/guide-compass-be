@@ -54,11 +54,11 @@ model User {
 }
 
 model Guide {
-  id                    String                  @id @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
   bio                   String?
   tagline               String?
   location              LocationType?
-  dailyRate             Float?
   expertises            String[]                @default([])
   languages             String[]
   experiences           GuideExperience[]
@@ -74,16 +74,18 @@ model Guide {
 enum VerificationDocumentType {
   PASSPORT
   LICENSE
+  CITIZENSHIP
 }
 
 model VerificationDocuments {
-  id        String                   @id @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
   type      VerificationDocumentType
   fileUrl   String
   createdAt DateTime                 @default(now())
   updatedAt DateTime                 @updatedAt
-  Guide     Guide?                   @relation(fields: [guideId], references: [id])
-  guideId   String?                  @db.ObjectId
+  guideId   String                   @db.ObjectId
+  Guide     Guide                    @relation(fields: [guideId], references: [id])
 }
 
 type GuideVerificationType {
@@ -212,7 +214,7 @@ model Package {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
-  currency    String   @default("USD")
+  currency    String   @default("RS")
   price       Float
   duration    Int
   location    String

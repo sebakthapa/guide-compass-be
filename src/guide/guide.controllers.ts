@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
-import { catchAsync } from '../utils/catchAsync';
+import { catchAsync, catchAsyncFile } from '../utils/catchAsync';
 import { sendFailureRes, sendSuccessRes } from '../utils/formatResponse';
 import { StatusCodes } from 'http-status-codes';
-import { GuideDetailsUpdateValidatedReqBody, GuideListFetchFilters } from '../types/guide.types';
+import { AddGuideDocumentBody, GuideDetailsUpdateValidatedReqBody, GuideListFetchFilters } from '../types/guide.types';
 import * as services from './guide.services';
 import { changeUserRole } from '../users/users.services';
+import { File } from 'formidable';
+import { GUIDE_DOCUMENT_TYPES } from './guide.config';
 
 export const guideContUpdateDetails = catchAsync(async (req: Request, res: Response) => {
   const data = req.body as GuideDetailsUpdateValidatedReqBody;
@@ -24,7 +26,7 @@ export const guideContUpdateDetails = catchAsync(async (req: Request, res: Respo
 export const guideContFetchSelfDetails = catchAsync(async (req: Request, res: Response) => {
   const user = req.decoded!;
 
-  const fetchedUser = await services.fetchUserWithGuideDetails(user.id);
+  const fetchedUser = await services.fetchUserWithGuideDetails(user.id, true);
 
   if (!fetchedUser) {
     return sendSuccessRes(StatusCodes.OK)(res, 'Guide details fetched successfully')({});
@@ -85,4 +87,38 @@ export const guideContBecomeGuide = catchAsync(async (req: Request, res: Respons
   const { password: _, ...detailsWithoutPassword } = data;
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Became guide')(detailsWithoutPassword);
+});
+
+// export const guideContRequestProfileReview = catchAsync(async(req:Request, res:Response) => {
+
+//   await changeGuideVerificationStatus
+
+//   return sendSuccessRes(StatusCodes.OK)(res, 'Profile sent for review')({})
+// })
+
+export const guideContAddGuideDocument = catchAsyncFile(async (req: Request, res: Response) => {
+  // @ts-ignore
+  const document = req.document?.[0] as File | null;
+  const { type } = req.body as AddGuideDocumentBody;
+  const user = req.decoded!;
+
+  if (!document) {
+    return sendFailureRes(StatusCodes.BAD_REQUEST)(res, 'document is required')({});
+  }
+
+  const uploadedData = await services.addGuideDocument(user.id, document, type);
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Document Added')(uploadedData);
+});
+
+export const guideContremoveGuideDocument = catchAsyncFile(async (req: Request, res: Response) => {
+  const id = req.params.id as unknown as string;
+
+  const deletedDoc = await services.removeGuideDocument(id);
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Document Deleted')(deletedDoc || {});
+});
+
+export const guideContFetchAvailableDocuments = catchAsyncFile((req: Request, res: Response) => {
+  return sendSuccessRes(StatusCodes.OK)(res, 'Fetched')(GUIDE_DOCUMENT_TYPES);
 });

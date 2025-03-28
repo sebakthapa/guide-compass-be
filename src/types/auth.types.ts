@@ -1,15 +1,5 @@
-export interface SignupRequestBody {
-  email: string;
-  username: string;
-  password: string;
-}
+import * as schemas from '../auth/auth.schemas';
 
-export interface VerifyOtpRequestBody {
-  otp: string;
-  token: string;
-}
-
-export interface LoginRequestBody {
-  identifier: string;
-  password: string;
-}
+export type SignupRequestBody = Zod.infer<typeof schemas.SIGNUP_SCHEMA>;
+export type VerifyOtpRequestBody = Zod.infer<typeof schemas.OPT_VERIFICATION_SCHEMA>;
+export type LoginRequestBody = Zod.infer<typeof schemas.LOGIN_SCHEMA>;

@@ -19,3 +19,6 @@ export const GUIDE_PROFILE_REJECT_SCHEMA = Joi.object({
 export const GUIDE_PROFILE_ACCEPT_SCHEMA = Joi.object({
   guideId: ID_SCHEMA.required(),
 });
+export const USER_ALTER_BAN_SCHEMA = Joi.object({
+  userId: ID_SCHEMA.required(),
+});

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { catchAsync } from '../utils/catchAsync';
 import { sendSuccessRes } from '../utils/formatResponse';
 import { StatusCodes } from 'http-status-codes';
-import { fetchUsersWithPagination } from '../users/users.services';
+import { fetchUsersWithPagination, updateUserById } from '../users/users.services';
 import {
   changeGuideVerificationStatus,
   fetchGuideDetailsByVerificationStatus,
@@ -45,6 +45,7 @@ export const adminContRejectGuideProfile = catchAsync(async (req: Request, res: 
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Guide profile rejected')(data);
 });
+
 export const adminContAcceptGuideProfile = catchAsync(async (req: Request, res: Response) => {
   const { guideId, remarks } = req.body;
 
@@ -52,4 +53,19 @@ export const adminContAcceptGuideProfile = catchAsync(async (req: Request, res: 
   // TODO: send email to guide saying it is accepted
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Guide profile verified')(data);
+});
+
+export const adminContBanUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  const data = await updateUserById(userId, { isBanned: true });
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'User banned')(data);
+});
+export const adminContUnbanUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  const data = await updateUserById(userId, { isBanned: false });
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'User banned')(data);
 });

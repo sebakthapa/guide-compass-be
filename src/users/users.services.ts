@@ -37,36 +37,9 @@ export const getUserByIdentifier = (identifier: string) => {
   return getUserByUsername(identifier);
 };
 
-export const updateUserById = (
-  id: string,
-  {
-    fullname,
-    imageUrl,
-    username,
-    password,
-  }: {
-    username?: string;
-    fullname?: string;
-    imageUrl?: string;
-    password?: string;
-  }
-) => {
-  const updatingDetails: Record<string, string> = {};
-  if (fullname) {
-    updatingDetails.fullname = fullname;
-  }
-  if (username) {
-    updatingDetails.username = username;
-  }
-  if (imageUrl) {
-    updatingDetails.image = imageUrl;
-  }
-  if (password) {
-    updatingDetails.password = password;
-  }
-
+export const updateUserById = (id: string, updateData: Prisma.UserUpdateInput) => {
   return prisma.user.update({
-    data: updatingDetails,
+    data: updateData,
     where: {
       id,
     },

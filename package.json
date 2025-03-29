@@ -39,6 +39,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "firebase": "^11.4.0",
+    "fly": "^4.6.16",
     "formidable": "^2.1.2",
     "generic-pool": "^3.9.0",
     "helmet": "^8.0.0",

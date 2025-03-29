@@ -249,7 +249,11 @@ export const fetchGuideDetailsByVerificationStatus = async (
 };
 
 export const changeGuideVerificationStatus = (guideId: string, status: VerificationStatus, remarks?: string) => {
-  return prisma.guide.update({ where: { id: guideId }, data: { verification: { status, remarks } } });
+  return prisma.guide.update({
+    where: { id: guideId },
+    data: { verification: { status, remarks } },
+    include: { user: { select: { email: true } } },
+  });
 };
 
 export const addGuideDocument = async (guideId: string, document: File, type: VerificationDocumentType) => {

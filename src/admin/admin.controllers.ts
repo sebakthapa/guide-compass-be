@@ -8,6 +8,7 @@ import {
   fetchGuideDetailsByVerificationStatus,
   fetchGuideListWithPagination,
 } from '../guide/guide.services';
+import * as services from './admin.services';
 
 export const adminContFetchUsers = catchAsync(async (req: Request, res: Response) => {
   const { limit, page, isBanned } = req.body;
@@ -41,7 +42,7 @@ export const adminContRejectGuideProfile = catchAsync(async (req: Request, res: 
   const { guideId, remarks } = req.body;
 
   const data = await changeGuideVerificationStatus(guideId, 'REJECTED', remarks);
-  // TODO: send email to guide saying it is rejected
+  services.sendGuideProfileRejectedEmail(data.user.email, remarks);
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Guide profile rejected')(data);
 });
@@ -50,7 +51,7 @@ export const adminContAcceptGuideProfile = catchAsync(async (req: Request, res: 
   const { guideId, remarks } = req.body;
 
   const data = await changeGuideVerificationStatus(guideId, 'VERIFIED', remarks);
-  // TODO: send email to guide saying it is accepted
+  services.sendGuideProfileAcceptedEmail(data.user.email);
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Guide profile verified')(data);
 });

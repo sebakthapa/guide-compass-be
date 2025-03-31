@@ -2,9 +2,13 @@ import Joi from 'joi';
 import { GUIDE_LIST_FETCH_SCHEMA } from '../guide/guide.schemas';
 import { z } from 'zod';
 import { ID_SCHEMA } from '../config/schema.constants';
+import { USER_ROLES } from '../users/user.config';
 
 export const USER_LIST_FETCH_SCHEMA = Joi.object({
   isBanned: Joi.boolean().valid(true, false),
+  roles: Joi.array()
+    .max(USER_ROLES.length)
+    .items(...USER_ROLES),
 }).concat(GUIDE_LIST_FETCH_SCHEMA);
 
 export const PENDING_GUIDE_FETCH_SCHEMA = z.object({

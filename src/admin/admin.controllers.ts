@@ -11,9 +11,9 @@ import {
 import * as services from './admin.services';
 
 export const adminContFetchUsers = catchAsync(async (req: Request, res: Response) => {
-  const { limit, page, isBanned } = req.body;
+  const { limit, page, isBanned, roles } = req.body;
 
-  const users = await fetchUsersWithPagination({ limit, page, isBannedStatus: isBanned });
+  const users = await fetchUsersWithPagination({ limit, page, isBannedStatus: isBanned, roles });
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Users List fetched successfully')(users);
 });

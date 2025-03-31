@@ -6,7 +6,7 @@ import * as validators from './admin.validators';
 
 const router = Router();
 
-router.get('/users', validateData(schemas.USER_LIST_FETCH_SCHEMA), cont.adminContFetchUsers);
+router.post('/users/list', validateData(schemas.USER_LIST_FETCH_SCHEMA), cont.adminContFetchUsers);
 router.get('/guides', validateData(schemas.USER_LIST_FETCH_SCHEMA), cont.adminContFetchGuides);
 router.get(
   '/guides/pending',

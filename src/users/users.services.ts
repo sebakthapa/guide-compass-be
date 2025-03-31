@@ -68,15 +68,17 @@ export const uploadUserProfile = async (image: File, userId: string) => {
 export const fetchUsersWithPagination = ({
   limit = 10,
   page = 1,
+  roles,
   isBannedStatus = false,
 }: {
   page?: number;
   limit?: number;
   isBannedStatus?: boolean;
+  roles: UserRole[];
 }) => {
   return prisma.user.findMany({
     skip: (page - 1) * limit,
     take: limit,
-    where: { role: 'USER', isBanned: isBannedStatus },
+    where: { role: { in: roles }, isBanned: isBannedStatus },
   });
 };

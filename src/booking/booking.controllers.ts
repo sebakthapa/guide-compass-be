@@ -27,7 +27,12 @@ export const bookingContBookGuide = catchAsync(async (req: Request, res: Respons
     )({});
   }
 
-  const amount = calculateBookingPrice(guide.dailyRate!, bookingData.numberOfPeople, distance, 10);
+  const amount = calculateBookingPrice(
+    guide.dailyRate!,
+    bookingData.numberOfPeople,
+    distance,
+    bookingData.numberOfPeople
+  );
 
   const deliveryCharge = 0;
   const serviceCharge = 0;

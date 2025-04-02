@@ -40,7 +40,7 @@ export const GUIDE_UPDATE_DETAILS_SCHEMA = Joi.object({
   bio: Joi.string(),
   tagline: Joi.string(),
   location: GUIDE_LOCATION_SCHEMA,
-  dailyRate: Joi.number(),
+  dailyRate: Joi.number().integer().min(400).max(5000),
   expertises: Joi.array().items(Joi.string()).max(6),
   languages: Joi.array().items(Joi.string()).max(6),
   experiences: Joi.array().items(GUIDE_EXPERIENCE_SCHEMA).max(5),

@@ -32,14 +32,14 @@ router.get('/session', verifyToken, cont.authContGetSession);
 // GET /api/logout
 router.get('/logout', cont.authContLogout);
 
-router.get(
+router.post(
   '/signup/resend-otp',
   validateZodSchema(schemas.RESEND_OTP_SCHEMA),
   validators.validateResendSignupOtp,
   cont.authContResendSignupOtp
 );
 
-router.get(
+router.post(
   '/reset-password/otp',
   validateZodSchema(schemas.RESET_PASSWORD_OTP_SCHEMA),
   validators.validateResetPasswordInitiate,

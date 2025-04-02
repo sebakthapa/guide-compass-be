@@ -11,7 +11,7 @@ import { deleteFromBucket, getPathFromPublicUrl, resolveGcloudDestPath, uploadTo
 export const upsertGuideDetailsById = async (data: Partial<GuideDetailsUpdateValidatedReqBody>, guideId: string) => {
   const updatingDetails: Prisma.GuideUpdateInput = {
     bio: data.bio,
-    dailyRate: data.dailyRate,
+    dailyRate: data.dailyRate ? +data.dailyRate : undefined,
     expertises: data.expertises,
     tagline: data.tagline,
     languages: data.languages,
@@ -23,7 +23,7 @@ export const upsertGuideDetailsById = async (data: Partial<GuideDetailsUpdateVal
 
   const creatingDetails: Prisma.GuideUpsertArgs['create'] = {
     bio: data.bio,
-    dailyRate: data.dailyRate,
+    dailyRate: data.dailyRate ? +data.dailyRate : undefined,
     expertises: data.expertises,
     tagline: data.tagline,
     languages: data.languages,
@@ -225,6 +225,7 @@ export const fetchGuideDetailsByVerificationStatus = async (
         languages: { isEmpty: false },
         location: { isSet: true },
         tagline: { isSet: true },
+        dailyRate: { isSet: true },
       } as Prisma.GuideWhereInput)
     : {};
 

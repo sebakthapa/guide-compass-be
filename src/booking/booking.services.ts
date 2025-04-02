@@ -22,7 +22,7 @@ export const createNewBooking = (
 };
 
 export const fetchBookingById = (id: string) => {
-  return prisma.booking.findFirst({ where: { id } });
+  return prisma.booking.findFirst({ where: { id }, include: { payment: true } });
 };
 
 export const fetchGuideBookingsWithFilters = (guideId: string, filters: GuideBookingFetchReqBody) => {
@@ -42,7 +42,7 @@ export const fetchUserBookingsWithFilters = (customerId: string, filters: GuideB
     where: { status, customerId },
     skip: (page - 1) * limit,
     take: limit,
-    include: { customer: { omit: { password: true } }, guide: { omit: { password: true } } },
+    include: { customer: { omit: { password: true } }, guide: { omit: { password: true } }, payment: true },
   });
 };
 

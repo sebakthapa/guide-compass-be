@@ -31,6 +31,9 @@ export type EnvVars = {
 
   // ENCRYPTION
   ENCRYPTION_SECRET: string;
+
+  // PAYMENT
+  ESEWA_SECRET: string;
 };
 
 declare namespace NodeJS {

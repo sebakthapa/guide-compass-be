@@ -54,8 +54,8 @@ model User {
 }
 
 model Guide {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
+  id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
+  dailyRate             Int?
   bio                   String?
   tagline               String?
   location              LocationType?
@@ -181,19 +181,20 @@ model Booking {
 
   // A booking can have one or more reviews
   reviews Review[]
-  Payment Payment[]
+
+  // One-to-one relation with Payment
+  payment Payment?
 }
 
 model Payment {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  bookingId     String        @db.ObjectId
+  bookingId     String        @unique @db.ObjectId
   amount        Float
   paymentDate   DateTime      @default(now())
-  paymentMethod String?
+  paymentMethod String        @default("CASH")
   status        PaymentStatus @default(PENDING)
-  transactionId String?
 
-  // Relation to the associated booking
+  // One-to-one relation to Booking
   booking Booking @relation(fields: [bookingId], references: [id])
 }
 

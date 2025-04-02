@@ -39,6 +39,9 @@ const envObject: Record<keyof EnvVars, Joi.Schema> = {
 
   // ENCRYPTION
   ENCRYPTION_SECRET: Joi.string().required(),
+
+  // PAYMENT
+  ESEWA_SECRET: Joi.string().required(),
 };
 const envVarsSchema = Joi.object(envObject).unknown();
 

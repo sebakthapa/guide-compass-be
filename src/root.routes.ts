@@ -5,6 +5,7 @@ import userRouter from './users/users.routes';
 import bookingRouter from './booking/booking.routes';
 import packageRouter from './packages/packages.routes';
 import adminRouter from './admin/admin.routes';
+import paymentRouter from './payments/payments.routes';
 
 import { authorizeUserRole, verifyToken } from './middlewares/verifyToken';
 
@@ -17,5 +18,6 @@ router.use('/bookings', bookingRouter);
 router.use('/packages', packageRouter);
 
 router.use('/admin', verifyToken, authorizeUserRole('ADMIN'), adminRouter);
+router.use('/payments', verifyToken, authorizeUserRole('USER'), paymentRouter);
 
 export default router;

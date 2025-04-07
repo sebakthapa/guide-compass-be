@@ -18,6 +18,6 @@ router.use('/bookings', bookingRouter);
 router.use('/packages', packageRouter);
 
 router.use('/admin', verifyToken, authorizeUserRole('ADMIN'), adminRouter);
-router.use('/payments', verifyToken, authorizeUserRole('USER'), paymentRouter);
+router.use('/payments', verifyToken, paymentRouter);
 
 export default router;

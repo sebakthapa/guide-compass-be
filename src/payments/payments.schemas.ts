@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
-export const ESEWA_PAYMENT_INIT_SCHEMA = z.object({
-  // price:
+export const ESEWA_SUCCESS_SCHEMA = z.object({
+  token: z.string(),
 });

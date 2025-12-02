@@ -20,7 +20,7 @@ export const uploadFile = (uploadType = 'image', multiples = true) => {
           }
 
           if (!mimetype || !allowedMimeTypes.includes(mimetype)) {
-            throw badRequest(`Invalid file type received`);
+            throw badRequest(`Invalid file type received. Supported types: ${allowedMimeTypes.join(', ')}`);
           }
 
           return (mimetype && allowedMimeTypes.includes(mimetype)) || false;
@@ -34,6 +34,8 @@ export const uploadFile = (uploadType = 'image', multiples = true) => {
         if (err) {
           // @ts-ignore
           childProcess.exec(`rmdir /s /q ${form.uploadDir}`);
+
+          return next(err);
         }
 
         const filesKey = Object.keys(files);

@@ -2,6 +2,7 @@ import HttpStatus from 'http-status-codes';
 import { isEmpty } from 'lodash';
 import logger from './logger';
 import { Prisma } from '@prisma/client';
+import env from '../env';
 
 /**
  * Build error response for validation errors.
@@ -27,6 +28,10 @@ export interface ResponseError {
 }
 
 export function buildError(err: ResponseError) {
+  if (env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.error('Error captured in buildError:', err);
+  }
   // JWT ERRORS
   // eslint-disable-next-line no-constant-condition
   if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError') {

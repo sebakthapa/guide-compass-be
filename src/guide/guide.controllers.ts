@@ -99,6 +99,7 @@ export const guideContBecomeGuide = catchAsync(async (req: Request, res: Respons
 export const guideContAddGuideDocument = catchAsyncFile(async (req: Request, res: Response) => {
   // @ts-ignore
   const document = req.document?.[0] as File | null;
+
   const { type } = req.body as AddGuideDocumentBody;
   const user = req.decoded!;
 

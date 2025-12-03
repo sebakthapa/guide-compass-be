@@ -13,13 +13,17 @@ export const usersContUpdateDetails = catchAsyncFile(async (req: Request, res: R
   const [image] = (req.image as File[]) || [];
   const user = req.decoded!;
 
-  if (!image) {
-    return sendFailureRes(StatusCodes.BAD_REQUEST)(res, `Invalid image received`)({});
-  }
+  // if (!image) {
+  //   return sendFailureRes(StatusCodes.BAD_REQUEST)(res, `Invalid image received`)({});
+  // }
 
-  // TODO: delete previous profile image
-  const uploadedFile = await services.uploadUserProfile(image, user?.id);
-  const imageUrl = uploadedFile.publicUrl();
+  let imageUrl: string | undefined = undefined;
+
+  if (image) {
+    // TODO: delete previous profile image
+    const uploadedFile = await services.uploadUserProfile(image, user?.id);
+    imageUrl = uploadedFile.publicUrl();
+  }
 
   const updatedUser = await services.updateUserById(user.id, { ...data, image: imageUrl });
   const { password: _pw, ...updatedUserWithoutPw } = updatedUser;

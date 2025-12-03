@@ -4,7 +4,6 @@ import { uploadFile } from '../middlewares/uploadFile';
 import { authorizeUser, verifyToken } from '../middlewares/verifyToken';
 import { validateData, validateZodSchema } from '../middlewares/validateData';
 import * as schemas from './users.schemas';
-import * as validators from './users.validators';
 
 const router = Router();
 
@@ -14,7 +13,7 @@ router.patch(
   authorizeUser,
   uploadFile('image', false),
   validateData(schemas.USER_UPDATE_SCHEMA),
-  validators.validateImageForUserupdate,
+  // validators.validateImageForUserupdate,
   cont.usersContUpdateDetails
 );
 

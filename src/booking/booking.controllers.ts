@@ -4,7 +4,7 @@ import { sendFailureRes, sendSuccessRes } from '../utils/formatResponse';
 import { StatusCodes } from 'http-status-codes';
 import * as services from './booking.services';
 import { BookingCalendarFetchReqBody, GuideBookingFetchReqBody, GuideBookingReqBody } from './booking.types';
-import { createPaymentEntry } from '../payments/payments.services';
+import { createPaymentEntry, deletePaymentByBookingId } from '../payments/payments.services';
 import { getDistance } from '../utils/geocoding';
 import { fetchGuideDetailsById } from '../guide/guide.services';
 import { calculateBookingPrice, generateEsewasignature } from '../payments/payment.utils';
@@ -108,6 +108,7 @@ export const bookingContRejectBooking = catchAsync(async (req: Request, res: Res
 export const bookingContDeleteBooking = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.bookingId;
 
+  await deletePaymentByBookingId(id);
   const data = await services.deleteBookingById(id);
 
   return sendSuccessRes(StatusCodes.OK)(res, 'Booking deleted successfully')(data);

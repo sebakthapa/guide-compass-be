@@ -8,3 +8,7 @@ export const createPaymentEntry = (bookingId: string, amount: number) => {
 export const updatePaymentById = (id: string, data: Prisma.PaymentUpdateInput) => {
   return prisma.payment.update({ where: { id }, data });
 };
+
+export const deletePaymentByBookingId = (bookingId: string) => {
+  return prisma.payment.delete({ where: { bookingId } });
+};

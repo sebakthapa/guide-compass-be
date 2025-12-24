@@ -95,6 +95,7 @@ export const guideContBecomeGuide = catchAsync(async (req: Request, res: Respons
 
 //   return sendSuccessRes(StatusCodes.OK)(res, 'Profile sent for review')({})
 // })
+//
 
 export const guideContAddGuideDocument = catchAsyncFile(async (req: Request, res: Response) => {
   // @ts-ignore

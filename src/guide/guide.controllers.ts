@@ -7,6 +7,7 @@ import * as services from './guide.services';
 import { changeUserRole } from '../users/users.services';
 import { File } from 'formidable';
 import { GUIDE_DOCUMENT_TYPES } from './guide.config';
+import { badRequest } from '@hapi/boom';
 
 export const guideContUpdateDetails = catchAsync(async (req: Request, res: Response) => {
   const data = req.body as GuideDetailsUpdateValidatedReqBody;
@@ -89,13 +90,24 @@ export const guideContBecomeGuide = catchAsync(async (req: Request, res: Respons
   return sendSuccessRes(StatusCodes.OK)(res, 'Became guide')(detailsWithoutPassword);
 });
 
-// export const guideContRequestProfileReview = catchAsync(async(req:Request, res:Response) => {
+export const guideContRequestProfileReview = catchAsync(async (req: Request, res: Response) => {
+  const user = req.decoded;
 
-//   await changeGuideVerificationStatus
+  const guideId = user?.guideId;
 
-//   return sendSuccessRes(StatusCodes.OK)(res, 'Profile sent for review')({})
-// })
-//
+  if (!guideId) {
+    throw badRequest('Guide profile does not exist');
+  }
+
+  const guide = await services.fetchGuideDetailsById(guideId);
+  if (guide?.verification?.status !== 'REJECTED') {
+    throw badRequest(`Only guides with rejected profiles can request for review`);
+  }
+
+  await services.changeGuideVerificationStatus(guideId, 'PENDING');
+
+  return sendSuccessRes(StatusCodes.OK)(res, 'Profile sent for review')({});
+});
 
 export const guideContAddGuideDocument = catchAsyncFile(async (req: Request, res: Response) => {
   // @ts-ignore

@@ -16,6 +16,9 @@ router.get('/available-documents', cont.guideContFetchAvailableDocuments);
 // PATCH /api/guides/become-guide
 router.patch('/become-guide', verifyToken, authorizeUser, cont.guideContBecomeGuide);
 
+// PATCH /api/guides/request-review
+router.patch('/request-review', verifyToken, authorizeUserRole('GUIDE'), cont.guideContRequestProfileReview);
+
 // PATCH /api/guides/
 router.patch(
   '/',

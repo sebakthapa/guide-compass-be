@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 import path from 'path';
 import env from '../env';
 

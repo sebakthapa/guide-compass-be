@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 import { Prisma, VerificationDocumentType, VerificationStatus } from '@prisma/client';
 import prisma from '../db';
 import { GuideDetailsUpdateValidatedReqBody, GuideListFetchFilters } from '../types/guide.types';

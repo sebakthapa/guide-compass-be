@@ -107,9 +107,9 @@ export const validateResetPasswordInitiate = catchAsync(async (req: Request, res
     );
 
     // Check if the latest OTP was created less than 1 minute ago
-    if (moment().diff(moment(latestOtp.createdAt), 'seconds') < sec('5s')) {
-      return sendFailureRes(StatusCodes.TOO_MANY_REQUESTS)(res, 'Too frequent request please wait!')({});
-    }
+    // if (moment().diff(moment(latestOtp.createdAt), 'seconds') < sec('10s')) {
+    //   return sendFailureRes(StatusCodes.TOO_MANY_REQUESTS)(res, 'Too frequent request please wait!')({});
+    // }
   }
 
   return next();

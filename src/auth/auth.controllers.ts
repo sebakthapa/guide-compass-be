@@ -65,7 +65,7 @@ export const authContLogin = catchAsync(async (req: Request, res: Response) => {
   const user = await getUserByIdentifier(identifier);
 
   if (isEmpty(user)) {
-    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid Credentails')({});
+    return sendFailureRes(StatusCodes.UNAUTHORIZED)(res, 'Invalid Credentails a')({});
   }
 
   const isPasswordCorrect = await comparePassword(password, user.password);

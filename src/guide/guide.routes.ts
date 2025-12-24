@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 import { Router } from 'express';
 import * as cont from './guide.controllers';
 import * as validators from './guide.validators';

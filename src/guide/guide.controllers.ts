@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 import { Request, Response } from 'express';
 import { catchAsync, catchAsyncFile } from '../utils/catchAsync';
 import { sendFailureRes, sendSuccessRes } from '../utils/formatResponse';

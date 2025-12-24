@@ -29,7 +29,6 @@ export async function getCoordinates(location: LocationType | string) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.log(error.response.data);
     return null;
   }
 }
